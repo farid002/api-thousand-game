@@ -19,9 +19,9 @@ class GameState(Enum):
 class Game(BaseModel):
     id: Optional[str]
     players: List[str]
-    creation_date: str = datetime.now()
-    game_state: str = GameState.PLAYING
-    current_round: int = 0
+    creation_date: str
+    game_state: str
+    current_round: int
 
 
 class Round(BaseModel):
@@ -65,10 +65,44 @@ def create_game_table():
     conn.close()
 
 
-def create_game(game: Game):
+def start_round():
+    return
+
+
+def make_bid(player: str, last_bid: int):
+    return
+
+
+def take_3_cards(player: str, card: str):
+    return
+
+
+def give_2_cards(player: str, card: str):
+    return
+
+
+def make_last_bid(player: str, last_bid: int):
+    return
+
+
+def play_card(player: str, card: str):
+    return
+
+
+def finalize_round(player: str, card: str):
+    return
+
+
+def create_game(players: List[str]):
+    game = Game
+    game.id = str(uuid.uuid4())  # Generate UUID for the game
+    game.players = players
+    game.creation_date = str(datetime.now())
+    game.game_state = GameState.PLAYING.value
+    game.current_round = 0
+
     conn = sqlite3.connect("games.db")
     c = conn.cursor()
-    game.id = str(uuid.uuid4())  # Generate UUID for the game
     c.execute("INSERT INTO games (id, players, creation_date, game_state) VALUES (?, ?, ?, ?)",
               (game.id, ",".join(game.players), game.creation_date, game.game_state))
     conn.commit()
@@ -76,9 +110,9 @@ def create_game(game: Game):
 
 
 @app.put("/games/")
-async def create_game_endpoint(game: Game):
-    create_game(game)
-    return game
+async def create_game_endpoint(players: List[str]):
+    create_game(players)
+    return players
 
 
 if __name__ == "__main__":
