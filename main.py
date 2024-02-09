@@ -16,8 +16,16 @@ class GameState(Enum):
     FINISHED = "finished"
 
 
+class Player(BaseModel):
+    id: int  # 0, 1 or 2
+    hand_init: List[str]
+    hand_current: List[str]
+    bolt_count: int = 0
+    barrel_count: int = 0
+
+
 class Game(BaseModel):
-    id: Optional[str]
+    id: str
     players: List[str]
     creation_date: str
     game_state: str
@@ -25,32 +33,21 @@ class Game(BaseModel):
 
 
 class Round(BaseModel):
-    id: int
-    game_id: str
-    p1_hand_init: List[str]
-    p2_hand_init: List[str]
-    p3_hand_init: List[str]
-    p1_hand_current: List[str]
-    p2_hand_current: List[str]
-    p3_hand_current: List[str]
-    p1_bolt_count: int = 0
-    p2_bolt_count: int = 0
-    p3_bolt_count: int = 0
-    p1_barrel_count: int = 0
-    p2_barrel_count: int = 0
-    p3_barrel_count: int = 0
-    on_barrel: str = ""
+    id: int = 0
+    game_id: str = ""
+    on_barrel: int = -1  # player id
     activated_pairs: List[str] = []
-    bids: List[List[int]] = [[0, 0, 0]]  # 0: new, -1: pass, >100: bid_amount
+    bids: List[str] = ["0", "0", "0"]  # 0: new, -1: pass, >100: bid_amount
     last_bid_amount: int = 0
 
-    def __init__(self, id, game_id, p1_hand, p2_hand, p3_hand):
+    def __init__(self, id, game_id, on_barrel, activated_pairs, bids, last_bid_amount):
         super().__init__()
         self.id = id
         self.game_id = game_id
-        self.p1_hand_init = self.p1_hand_current = p1_hand
-        self.p2_hand_init = self.p2_hand_current = p2_hand
-        self.p3_hand_init = self.p3_hand_current = p3_hand
+        self.on_barrel = on_barrel
+        self.activated_pairs = activated_pairs
+        self.bids = bids
+        self.last_bid_amount = last_bid_amount
 
 
 def create_game_table():
@@ -60,12 +57,44 @@ def create_game_table():
                  (id TEXT PRIMARY KEY,
                  players TEXT,
                  creation_date TEXT,
-                 game_state TEXT)''')
+                 game_state TEXT,
+                 current_round INTEGER)''')
     conn.commit()
     conn.close()
 
 
-def start_round():
+@app.get("/start_round")
+async def start_round(game_id: str):
+    game: Game = await get_game(game_id)
+    game_round = Round(
+        id=str(game.current_round),
+        game_id=game_id,
+        on_barrel=-1,
+        activated_pairs=[],
+        bids=["0", "0", "0"],
+        last_bid_amount=0
+    )
+
+    conn = sqlite3.connect("games.db")
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS rounds
+                     (id INTEGER PRIMARY KEY,
+                     game_id TEXT,
+                     on_barrel INTEGER,
+                     activated_pairs TEXT,
+                     bids TEXT
+                     last_bid_amount INTEGER)''')
+    conn.commit()
+    conn.close()
+
+    conn = sqlite3.connect("games.db")
+    c = conn.cursor()
+    c.execute("INSERT INTO rounds (id, game_id, on_barrel, activated_pairs, bids, last_bid_amount) VALUES "
+              "(?, ?, ?, ?, ?, ?)", (game_round.id, game_round.game_id, game_round.on_barrel,
+                                     ",".join(game_round.activated_pairs),
+                                     ",".join(game_round.bids), game_round.last_bid_amount))
+    conn.commit()
+    conn.close()
     return
 
 
@@ -93,9 +122,9 @@ def finalize_round(player: str, card: str):
     return
 
 
-def create_game(players: List[str]):
+def create_game(game_id: str, players: List[str]):
     game = Game
-    game.id = str(uuid.uuid4())  # Generate UUID for the game
+    game.id = game_id  # str(uuid.uuid4())  # Generate UUID for the game
     game.players = players
     game.creation_date = str(datetime.now())
     game.game_state = GameState.PLAYING.value
@@ -103,15 +132,29 @@ def create_game(players: List[str]):
 
     conn = sqlite3.connect("games.db")
     c = conn.cursor()
-    c.execute("INSERT INTO games (id, players, creation_date, game_state) VALUES (?, ?, ?, ?)",
-              (game.id, ",".join(game.players), game.creation_date, game.game_state))
+    c.execute("INSERT INTO games (id, players, creation_date, game_state, current_round) VALUES (?, ?, ?, ?, ?)",
+              (game.id, ",".join(game.players), game.creation_date, game.game_state, game.current_round))
     conn.commit()
     conn.close()
 
 
-@app.put("/games/")
-async def create_game_endpoint(players: List[str]):
-    create_game(players)
+@app.get("/game")
+async def get_game(game_id: str):
+    conn = sqlite3.connect("games.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM games WHERE id=?", (game_id,))
+    game_data = c.fetchone()
+    conn.close()
+    if game_data:
+        return Game(id=game_data[0], players=game_data[1].split(','), creation_date=game_data[2],
+                    game_state=game_data[3], current_round=game_data[4])
+    else:
+        return None
+
+
+@app.put("/games")
+async def create_game_endpoint(game_id: str, players: List[str]):
+    create_game(game_id, players)
     return players
 
 
