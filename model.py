@@ -34,6 +34,7 @@ class GameState(Enum):
     BIDDING = "bidding"
     FINISHED = "finished"
 
+# TODO: We can convert the following classes to dataclasses
 
 class Player(BaseModel):
     id: str

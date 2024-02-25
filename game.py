@@ -5,6 +5,7 @@ from database import *
 import uuid
 import random
 
+# TODO: create a Game class to handle the game operations
 
 def create_game(game_id: str, players_ids: List[str]):
     game = Game(id=game_id, players_ids=players_ids)  # str(uuid.uuid4())  # Generate UUID for the game

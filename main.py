@@ -6,6 +6,7 @@ import uvicorn
 
 app = FastAPI()
 
+# TODO: use pydantic models in all endpoints
 
 @app.get("/start_round")
 def start_round_endpoint(game_id: str):

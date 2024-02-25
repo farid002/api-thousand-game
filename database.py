@@ -1,6 +1,7 @@
 import sqlite3
 from model import *
 
+# TODO: use SQL Alchemy or SQLModel to handle the database operations
 
 def create_game_table():
     conn = sqlite3.connect("games.db")
