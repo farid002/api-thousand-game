@@ -13,8 +13,8 @@ def start_round_endpoint(game_id: str):
 
 
 @app.put("/make_bid")
-def make_bid_endpoint(player: str, bid: int):
-    return make_bid(player, bid)
+def make_bid_endpoint(game_id: str, player_local_id: str, bid: str):
+    return make_bid(game_id, player_local_id, bid)
 
 
 @app.put("/take_three_cards")

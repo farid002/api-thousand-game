@@ -1,8 +1,4 @@
-from datetime import datetime
-from model import *
-import sqlite3
 from database import *
-import uuid
 import random
 
 
@@ -86,8 +82,26 @@ def deal_cards(players: List[Player]):
     return players, talon
 
 
-def make_bid(player, bid):
-    return
+def make_bid(game_id: str, player_local_id: str, bid: str):
+    # Retrieve player data from the database
+    curr_round = get_current_round_from_db(game_id)
+    if curr_round is None:
+        return "Round not found"
+
+    if (bid <= curr_round.bids[(int(player_local_id) + 1) % 3] or
+            bid <= curr_round.bids[(int(player_local_id) + 2) % 3]):
+        return "Less than biddable amount"
+    curr_round.bids[int(player_local_id)] = bid
+
+    # Update the player's bid in the database
+    conn = sqlite3.connect("games.db")
+    c = conn.cursor()
+    c.execute("UPDATE round SET bids = ? WHERE id=? AND game_id = ?",
+              (",".join(curr_round.bids), curr_round.id, game_id))
+    conn.commit()
+    conn.close()
+
+    return "Bid made successfully"
 
 
 def take_three_cards(player, card):

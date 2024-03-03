@@ -34,12 +34,13 @@ def create_round_table():
     conn = sqlite3.connect("games.db")
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS round
-                 (id INTEGER PRIMARY KEY,
+                 (id INTEGER,
                  game_id TEXT,
                  on_barrel INTEGER,
                  activated_pairs TEXT,
                  bids TEXT,
                  last_bid_amount INTEGER,
+                 PRIMARY KEY (id, game_id)
                  FOREIGN KEY(game_id) REFERENCES game(id))''')
     conn.commit()
     conn.close()
@@ -64,10 +65,29 @@ def update_players_db(c, players):
                    players[i].barrel_count))
 
 
+def get_current_round_from_db(game_id: str):
+    conn = sqlite3.connect("games.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM round WHERE game_id = ? ORDER BY id DESC LIMIT 1", game_id)
+    round_data = c.fetchone()
+    conn.close()
+
+    if round_data:
+        round_instance = Round(id=round_data[0],
+                               game_id=round_data[1],
+                               on_barrel=int(round_data[2]),
+                               activated_pairs=round_data[3].split(','),
+                               bids=round_data[4].split(','),
+                               last_bid_amount=int(round_data[5]))
+        return round_instance
+    else:
+        return None
+
+
 def get_player_from_db(player_id: str):
     conn = sqlite3.connect("games.db")
     c = conn.cursor()
-    c.execute("SELECT * FROM player WHERE id = ?", player_id)
+    c.execute("SELECT * FROM player WHERE id=?", (player_id,))
     player_data = c.fetchone()
     conn.close()
 
