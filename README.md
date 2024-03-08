@@ -31,3 +31,10 @@ Class Diagram of the API has been illustrated below.
 **DID YOU MODIFY ANYTHING RELATED DATABASE?**
  - Update the **.drawio** file under **/assets** folder on https://app.diagrams.net/ accordingly
  - Export as JPG with 20 margin and replace the /assets/er-diagram.jpg 
+
+
+## Contribution
+- Don't forget to activate pre-commit locally (as stated on Setup steps)
+- Follow correct naming conventions, especially PEP8 standards. Check further on: https://peps.python.org/pep-0008/
+- Create branch with a special pattern: **<type>/<github_issue_no>/<short_desc>**. Type can only be: feature, bugfix or other. Sample branch name: **feature/2/get_talon_function**
+- After branch is ready to merge with develop branch, please create a Pull Request (PR) and assign Farid Huseynov as a reviewer.
