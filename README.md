@@ -14,7 +14,7 @@ An API Repository for Thousand Card mobile game.
    ```
 3. Install needed packages
    ```
-   pip install -r requirement.txt
+   pip install -r requirements.txt
    ```
 4. Activate pre-commit **(IMPORTANT!)**
    ```
