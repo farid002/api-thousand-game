@@ -36,5 +36,5 @@ Class Diagram of the API has been illustrated below.
 ## Contribution
 - Don't forget to activate pre-commit locally (as stated on Setup steps)
 - Follow correct naming conventions, especially PEP8 standards. Check further on: https://peps.python.org/pep-0008/
-- Create branch with a special pattern: **<type>/<github_issue_no>/<short_desc>**. Type can only be: feature, bugfix or other. Sample branch name: **feature/2/get_talon_function**
+- Create branch with a special pattern: **<issue_type>/<github_issue_no>/<short_desc>**. Issue type can only be: feature, bugfix or other. Sample branch name: **feature/2/get_talon_function**
 - After branch is ready to merge with develop branch, please create a Pull Request (PR) and assign Farid Huseynov as a reviewer.
