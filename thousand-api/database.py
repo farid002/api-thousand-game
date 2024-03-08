@@ -1,9 +1,8 @@
 """TODO: Write docstring"""
 
+from model import Base, Player, Round
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from model import Base, Player, Round
 
 engine = create_engine("sqlite:///games.db")
 Session = sessionmaker(bind=engine)

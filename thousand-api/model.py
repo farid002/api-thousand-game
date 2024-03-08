@@ -103,7 +103,7 @@ class Game(Base):
     player2_id = Column(String, ForeignKey(Player.id))
     player3_id = Column(String, ForeignKey(Player.id))
     creation_date = Column(String)
-    game_state = Column(String, default=GameState.PLAYING.value)
+    game_state = Column(String, default=GameState.CREATED.value)
     current_round = Column(Integer, default=0)
 
     player1 = relationship("Player", foreign_keys="Game.player1_id")
