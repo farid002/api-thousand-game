@@ -186,13 +186,13 @@ def make_bid(game_id: str, player_id: str, bid: int):
     return "Bid made successfully"
 
 
-def take_talon(game_id: str, player_local_id: int) -> str:
+def take_talon(game_id: str, player_id: int) -> str:
     """
     Allows a player to take three cards from the talon during their turn.
 
     Args:
         game_id (str): The ID of the game.
-        player_local_id (int): The local ID of the player (0, 1, or 2).
+        player_id (int): The Global ID of the player (eg: jane.doe@example.com).
         cards (List[Tuple[CardNumber, CardSuit]]): A list of three tuples representing the card number and suit.
 
     Returns:
@@ -214,7 +214,7 @@ def take_talon(game_id: str, player_local_id: int) -> str:
         session.close()
         return "Not enough cards in the talon"
 
-    player = session.query(Player).filter_by(local_id=player_local_id).first()
+    player = session.query(Player).filter_by(id=player_id).first()
 
     if not player:
         session.close()
@@ -227,7 +227,7 @@ def take_talon(game_id: str, player_local_id: int) -> str:
             return f"Invalid card: {card}"
 
     # add the card to player's hand
-    player.cards_current_list.extend(card for card in cards)
+    player.cards_current_list = player.cards_current_list + cards
 
     session.add(curr_round_obj)
     session.add(player)
