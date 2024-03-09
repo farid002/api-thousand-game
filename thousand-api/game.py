@@ -60,13 +60,13 @@ def start_round(game_id: str):
     if not game:
         session.close()
         return "Game not found"
-    game.game_state = GameState.CREATED.value
+    game.game_state = GameState.PLAYING.value
     game.current_round = game.current_round + 1
     session.add(game)
 
     players = (
         session.query(Player)
-        .filter(Player.id.in_([game.player1_id, game.player2_id, game.player3_id]))
+        .filter(Player.id.in_([game.player0_id, game.player1_id, game.player2_id]))
         .all()
     )
     players, talon = deal_cards(players)
@@ -112,23 +112,26 @@ def deal_cards(players: List[Player]):
     return players, talon
 
 
-def make_bid(game_id: str, player_local_id: str, bid: str):
+def make_bid(game_id: str, player_local_id: int, bid: int):
     """TODO: Write docstring"""
     session = Session()
 
-    curr_round = get_current_round_from_db(session, game_id)
-    if not curr_round:
+    curr_round_obj = get_current_round_from_db(session, game_id)
+    if not curr_round_obj:
         session.close()
         return "Round not found"
 
-    if int(bid) <= int(curr_round.bids[(int(player_local_id) + 1) % 3]) or int(
-        bid
-    ) <= int(curr_round.bids[(int(player_local_id) + 2) % 3]):
+    next_player_bid = int(curr_round_obj.bids_list[(player_local_id + 1) % 3])
+    prev_player_bid = int(curr_round_obj.bids_list[(player_local_id + 2) % 3])
+
+    if bid <= next_player_bid or bid <= prev_player_bid:
         session.close()
         return "Less than biddable amount"
 
-    curr_round.bids[int(player_local_id)] = bid
-    session.add(curr_round)
+    temp_bids_list = curr_round_obj.bids_list
+    temp_bids_list[player_local_id] = str(bid)
+    curr_round_obj.bids_list = temp_bids_list
+    session.add(curr_round_obj)
     session.commit()
     session.close()
 
