@@ -26,10 +26,13 @@ def pass_bid_endpoint(game_id: str = "game1", player_id: str = "farid"):
     return pass_bid(game_id, player_id)
 
 
-@app.put("/take_three_cards")
-def take_three_cards_endpoint(player: str, card: str):
+@app.put("/take_talon")
+def take_three_cards_endpoint(
+    game_id: str, player_local_id: int, cards: List[tuple[str, str]]
+):
     """TODO: Write docstring"""
-    return take_three_cards(player, card)
+    card_tuples = [(CardNumber(number), CardSuit(suit)) for number, suit in cards]
+    return take_talon(game_id, player_local_id, card_tuples)
 
 
 @app.put("/give_two_cards")
