@@ -14,8 +14,8 @@ class CardSuit(Enum):
 
     HEART = "♥"  # ♡
     DIAMOND = "♦"  # ♢
-    CLUB = "♧"  # ♧
     SPADE = "♤"  # ♤
+    CLUB = "♧"  # ♧
 
 
 class CardNumber(Enum):
