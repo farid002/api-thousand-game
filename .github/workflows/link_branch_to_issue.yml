@@ -1,0 +1,27 @@
+name: Link Branch to Issue
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  link_branch_to_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install PyGithub
+
+      - name: Link Branch to Issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_SECRET }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python link_branch_to_issue.py
