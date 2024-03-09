@@ -18,6 +18,7 @@ from model import CardNumber, CardSuit, Game, Player, Round
 
 def create_game(game_id: str, players_ids: List[str]):
     """Create a new game with the given game ID and player IDs."""
+    """Create a new game with the given game ID and player IDs."""
     session = Session()
 
     game = Game(
