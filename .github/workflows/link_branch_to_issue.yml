@@ -24,4 +24,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN_SECRET }}
           GITHUB_REF: ${{ github.ref }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python link_branch_to_issue.py
+        run: python .github/workflows/link_branch_to_issue.py
