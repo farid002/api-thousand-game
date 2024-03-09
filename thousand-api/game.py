@@ -17,7 +17,7 @@ from model import CardNumber, CardSuit, Game, Player, Round
 
 
 def create_game(game_id: str, players_ids: List[str]):
-    """TODO: Write docstring"""
+    """Create a new game with the given game ID and player IDs."""
     session = Session()
 
     game = Game(
@@ -38,9 +38,9 @@ def create_game(game_id: str, players_ids: List[str]):
     ]
 
     for player in players:
-        session.merge(player)
-    session.commit()
+        session.add(player)
 
+    session.commit()
     session.close()
 
     return players_ids
