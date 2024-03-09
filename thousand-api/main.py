@@ -15,9 +15,15 @@ def start_round_endpoint(game_id: str):
 
 
 @app.put("/make_bid")
-def make_bid_endpoint(game_id: str, player_local_id: int, bid: int):
+def make_bid_endpoint(game_id: str, player_id: str, bid: int):
     """TODO: Write docstring"""
-    return make_bid(game_id, player_local_id, bid)
+    return make_bid(game_id, player_id, bid)
+
+
+@app.put("/pass_bid")
+def pass_bid_endpoint(game_id: str, player_id: str):
+    """Passing during the bidding"""
+    return pass_bid(game_id, player_id)
 
 
 @app.put("/take_three_cards")

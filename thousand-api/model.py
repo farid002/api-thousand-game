@@ -10,16 +10,16 @@ Base = declarative_base()
 
 
 class CardSuit(Enum):
-    """TODO: Write docstring"""
+    """Suit of the card"""
 
     HEART = "♥"  # ♡
     DIAMOND = "♦"  # ♢
-    SPADE = "♤"  # ♤
     CLUB = "♧"  # ♧
+    SPADE = "♤"  # ♤
 
 
 class CardNumber(Enum):
-    """TODO: Write docstring"""
+    """Number of the card"""
 
     NINE = "9"
     JACK = "J"
@@ -30,7 +30,7 @@ class CardNumber(Enum):
 
 
 class CardValue(Enum):
-    """TODO: Write docstring"""
+    """Numeric value of each card"""
 
     NINE = 0
     JACK = 2
@@ -40,12 +40,32 @@ class CardValue(Enum):
     ACE = 11
 
 
+class Pair(Enum):
+    """Card Pairs"""
+
+    HEART = ["K♥", "Q♥"]
+    DIAMOND = ["K♦", "Q♦"]
+    CLUB = ["K♧", "Q♧"]
+    SPADE = ["K♤", "Q♤"]
+
+
+class PairValue(Enum):
+    """Each Pair has a value during 'melden' or used for max. biddable amount calculation"""
+
+    HEART = 100
+    DIAMOND = 80
+    CLUB = 60
+    SPADE = 40
+
+
 class GameState(Enum):
     """TODO: Write docstring"""
 
     CREATED = "created"
     PLAYING = "playing"
     BIDDING = "bidding"
+    TALON = "talon"
+    REBIDDING = "rebidding"
     FINISHED = "finished"
 
 
@@ -61,6 +81,7 @@ class Player(Base):
     cards_played = Column(String)
     bolt_count = Column(Integer, default=0)
     barrel_count = Column(Integer, default=0)
+    max_biddable_amount = Column(Integer, default=120)
 
     @property
     def cards_init_list(self):
@@ -92,6 +113,24 @@ class Player(Base):
         """Setter: cards_played"""
         self.cards_played = ",".join(value) if value else ""
 
+    def assign_max_biddable_amount(self):
+        """Assigns maximum biddable amount value, which will be used as a limit during bidding."""
+        if len(self.cards_current) < 7:
+            return -1
+
+        self.max_biddable_amount = 120
+
+        if set(Pair.HEART.value) <= set(self.cards_current_list):
+            self.max_biddable_amount += PairValue.HEART.value
+        if set(Pair.DIAMOND.value) <= set(self.cards_current_list):
+            self.max_biddable_amount += PairValue.DIAMOND.value
+        if set(Pair.CLUB.value) <= set(self.cards_current_list):
+            self.max_biddable_amount += PairValue.CLUB.value
+        if set(Pair.SPADE.value) <= set(self.cards_current_list):
+            self.max_biddable_amount += PairValue.SPADE.value
+
+        return 0
+
 
 class Game(Base):
     """TODO: Write docstring"""
@@ -106,9 +145,9 @@ class Game(Base):
     game_state = Column(String, default=GameState.CREATED.value)
     current_round = Column(Integer, default=0)
 
-    player1 = relationship("Player", foreign_keys="Game.player0_id")
-    player2 = relationship("Player", foreign_keys="Game.player1_id")
-    player3 = relationship("Player", foreign_keys="Game.player2_id")
+    player0 = relationship("Player", foreign_keys="Game.player0_id")
+    player1 = relationship("Player", foreign_keys="Game.player1_id")
+    player2 = relationship("Player", foreign_keys="Game.player2_id")
 
 
 class Round(Base):
@@ -120,14 +159,12 @@ class Round(Base):
     game_id = Column(String, ForeignKey(Game.id))
     round_number = Column(Integer, default=1)  # can start from 1
     on_barrel = Column(Integer, default=-1)  # player local id
-    activated_pair = Column(
-        String, default=""
-    )  # CardSuit.<suit>.value (i.e.:"♥") or ""
+    activated_pair = Column(String, default="")  # CardSuit.<suit>.value (i.e.:"♥") or ""
     talon = Column(String, default="")
-    bids = Column(
-        String, default="0,0,0"
-    )  # "p1bid,p2bid,p3bid"; 0: new, -1: pass, >100: bid_amount.i.e.: "100,-1,110"
-    last_bid_amount = Column(Integer, default=0)
+    bid_starter = Column(Integer, default=0)  # player local id
+    bids = Column(String, default="0,0,0")  # "p1bid,p2bid,p3bid"; 0: new, -1: pass, >100: bid_amount.i.e.: "100,-1,110"
+    bid_winner = Column(Integer)  # player local id
+    final_bid_amount = Column(Integer, default=0)
 
     game = relationship("Game", foreign_keys="Round.game_id")
 
