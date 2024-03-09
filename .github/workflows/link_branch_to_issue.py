@@ -6,7 +6,7 @@ from github import Github
 
 # Extract issue number from branch name
 branch_name = os.getenv("GITHUB_REF")
-issue_number = branch_name.split("/")[1]  # Assuming branch name convention is <type>/<issue_number>/<short_desc>
+issue_number = branch_name.split("/")[-2]  # Assuming branch name convention is <type>/<issue_number>/<short_desc>
 
 # Initialize PyGithub client
 github_token = os.getenv("GITHUB_TOKEN")
