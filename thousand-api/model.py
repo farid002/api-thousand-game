@@ -99,16 +99,16 @@ class Game(Base):
     __tablename__ = "game"
 
     id = Column(String, primary_key=True)
+    player0_id = Column(String, ForeignKey(Player.id))
     player1_id = Column(String, ForeignKey(Player.id))
     player2_id = Column(String, ForeignKey(Player.id))
-    player3_id = Column(String, ForeignKey(Player.id))
     creation_date = Column(String)
     game_state = Column(String, default=GameState.CREATED.value)
     current_round = Column(Integer, default=0)
 
-    player1 = relationship("Player", foreign_keys="Game.player1_id")
-    player2 = relationship("Player", foreign_keys="Game.player2_id")
-    player3 = relationship("Player", foreign_keys="Game.player3_id")
+    player1 = relationship("Player", foreign_keys="Game.player0_id")
+    player2 = relationship("Player", foreign_keys="Game.player1_id")
+    player3 = relationship("Player", foreign_keys="Game.player2_id")
 
 
 class Round(Base):
@@ -122,11 +122,11 @@ class Round(Base):
     on_barrel = Column(Integer, default=-1)  # player local id
     activated_pair = Column(
         String, default=""
-    )  # CardSuit.<suit>.value or "" (if there is no activated pair)
+    )  # CardSuit.<suit>.value (i.e.:"♥") or ""
     talon = Column(String, default="")
-    bid_player1 = Column(Integer, default=0)  # 0: new, -1: pass, >100: bid_amount
-    bid_player2 = Column(Integer, default=0)  # 0: new, -1: pass, >100: bid_amount
-    bid_player3 = Column(Integer, default=0)  # 0: new, -1: pass, >100: bid_amount
+    bids = Column(
+        String, default="0,0,0"
+    )  # "p1bid,p2bid,p3bid"; 0: new, -1: pass, >100: bid_amount.i.e.: "100,-1,110"
     last_bid_amount = Column(Integer, default=0)
 
     game = relationship("Game", foreign_keys="Round.game_id")
@@ -161,3 +161,13 @@ class Round(Base):
             None
         """
         self.talon = ",".join(value) if value else ""
+
+    @property
+    def bids_list(self):
+        """Tbd"""
+        return self.bids.split(",") if self.bids else []
+
+    @bids_list.setter
+    def bids_list(self, value):
+        """Tbd"""
+        self.bids = ",".join(value) if value else ""

@@ -15,7 +15,7 @@ def start_round_endpoint(game_id: str):
 
 
 @app.put("/make_bid")
-def make_bid_endpoint(game_id: str, player_local_id: str, bid: str):
+def make_bid_endpoint(game_id: str, player_local_id: int, bid: int):
     """TODO: Write docstring"""
     return make_bid(game_id, player_local_id, bid)
 
