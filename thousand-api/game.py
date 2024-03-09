@@ -38,7 +38,7 @@ def create_game(game_id: str, players_ids: List[str]):
     ]
 
     for player in players:
-        session.add(player)
+        session.merge(player)
 
     session.commit()
     session.close()
@@ -186,38 +186,7 @@ def make_bid(game_id: str, player_id: str, bid: int):
     return "Bid made successfully"
 
 
-def pass_bid(game_id: str, player_id: str):
-    """Passing function during bidding"""
-    session = Session()
-
-    game = session.query(Game).filter_by(id=game_id).first()
-    curr_round_obj = get_current_round_from_db(session, game_id)
-    bidding_player = get_player_from_db(session, player_id)
-
-    if not curr_round_obj or not bidding_player:
-        session.close()
-        return "Round or player not found"
-
-    player_local_id = bidding_player.local_id
-
-    temp_bids_list = curr_round_obj.bids_list
-    temp_bids_list[player_local_id] = str(-1)  # -1 for pass
-    curr_round_obj.bids_list = temp_bids_list
-
-    if temp_bids_list.count("-1") >= 2:
-        game.game_state = GameState.TALON.value
-        curr_round_obj.bid_winner = next((index for index, value in enumerate(temp_bids_list) if value != "-1"), None)
-
-    session.add(curr_round_obj)
-    session.commit()
-    session.close()
-
-    return "Passed bidding successfully"
-
-
-def take_talon(
-    game_id: str, player_local_id: int, cards: List[tuple[CardNumber, CardSuit]]
-) -> str:
+def take_talon(game_id: str, player_local_id: int) -> str:
     """
     Allows a player to take three cards from the talon during their turn.
 
@@ -231,6 +200,7 @@ def take_talon(
     """
     session = Session()
     curr_round_obj = get_current_round_from_db(session, game_id)
+    cards = get_current_round_from_db(Session(), game_id).talon.split(",")
 
     if not curr_round_obj:
         session.close()
@@ -251,21 +221,13 @@ def take_talon(
         return "Player not found"
 
     # check whether cards are in talon
-    for card_number, card_suit in cards:
-        card_str = card_number.value + card_suit.value
-        if card_str not in curr_round_obj.talon_list:
+    for card in cards:
+        if card not in curr_round_obj.talon_list:
             session.close()
-            return f"Invalid card: {card_str}"
-
-    # remove from talon
-    for card_number, card_suit in cards:
-        card_str = card_number.value + card_suit.value
-        curr_round_obj.talon_list.remove(card_str)
+            return f"Invalid card: {card}"
 
     # add the card to player's hand
-    player.cards_current_list.extend(
-        [card_number.value + card_suit.value for card_number, card_suit in cards]
-    )
+    player.cards_current_list.extend(card for card in cards)
 
     session.add(curr_round_obj)
     session.add(player)
