@@ -215,9 +215,64 @@ def pass_bid(game_id: str, player_id: str):
     return "Passed bidding successfully"
 
 
-def take_three_cards(player, card):
-    """TODO: Write docstring"""
-    return
+def take_talon(
+    game_id: str, player_local_id: int, cards: List[tuple[CardNumber, CardSuit]]
+) -> str:
+    """
+    Allows a player to take three cards from the talon during their turn.
+
+    Args:
+        game_id (str): The ID of the game.
+        player_local_id (int): The local ID of the player (0, 1, or 2).
+        cards (List[Tuple[CardNumber, CardSuit]]): A list of three tuples representing the card number and suit.
+
+    Returns:
+        str: A success message if the operation is successful, an error message otherwise.
+    """
+    session = Session()
+    curr_round_obj = get_current_round_from_db(session, game_id)
+
+    if not curr_round_obj:
+        session.close()
+        return "Round not found"
+
+    if len(cards) != 3:
+        session.close()
+        return "You must take exactly three cards"
+
+    if len(curr_round_obj.talon_list) < 3:
+        session.close()
+        return "Not enough cards in the talon"
+
+    player = session.query(Player).filter_by(local_id=player_local_id).first()
+
+    if not player:
+        session.close()
+        return "Player not found"
+
+    # check whether cards are in talon
+    for card_number, card_suit in cards:
+        card_str = card_number.value + card_suit.value
+        if card_str not in curr_round_obj.talon_list:
+            session.close()
+            return f"Invalid card: {card_str}"
+
+    # remove from talon
+    for card_number, card_suit in cards:
+        card_str = card_number.value + card_suit.value
+        curr_round_obj.talon_list.remove(card_str)
+
+    # add the card to player's hand
+    player.cards_current_list.extend(
+        [card_number.value + card_suit.value for card_number, card_suit in cards]
+    )
+
+    session.add(curr_round_obj)
+    session.add(player)
+    session.commit()
+    session.close()
+
+    return "Cards taken successfully"
 
 
 def give_two_cards(player, card):
