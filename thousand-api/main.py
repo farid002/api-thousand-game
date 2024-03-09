@@ -27,10 +27,9 @@ def pass_bid_endpoint(game_id: str = "game1", player_id: str = "farid"):
 
 
 @app.put("/take_talon")
-def take_talon(game_id: str, player_local_id: int, cards: List[tuple[str, str]]):
+def take_talon_endpoint(game_id: str, player_local_id: int):
     """TODO: Write docstring"""
-    card_tuples = [(CardNumber(number), CardSuit(suit)) for number, suit in cards]
-    return take_talon(game_id, player_local_id, card_tuples)
+    return take_talon(game_id, player_local_id)
 
 
 @app.put("/give_two_cards")
