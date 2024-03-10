@@ -24,5 +24,5 @@ issue = repo.get_issue(int(issue_number))
 
 # Add comment to issue with a link to the branch
 branch_url = f"{repo.html_url}/tree/{branch_name}"
-issue.create_comment(f"This branch is automatically linked to issue [{issue.title}]({branch_url}).")
+# issue.create_comment(f"This branch is automatically linked to issue [{issue.title}]({branch_url}).")
 issue.add_to_labels(issue_label)
