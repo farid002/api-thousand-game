@@ -186,7 +186,7 @@ def make_bid(game_id: str, player_id: str, bid: int):
     return "Bid made successfully"
 
 
-def take_talon(game_id: str, player_id: int) -> str:
+def take_talon(game_id: str, player_id: str) -> str:
     """
     Allows a player to take three cards from the talon during their turn.
 
@@ -210,10 +210,6 @@ def take_talon(game_id: str, player_id: int) -> str:
         session.close()
         return "You must take exactly three cards"
 
-    if len(curr_round_obj.talon_list) < 3:
-        session.close()
-        return "Not enough cards in the talon"
-
     player = session.query(Player).filter_by(id=player_id).first()
 
     if not player:
@@ -234,6 +230,7 @@ def take_talon(game_id: str, player_id: int) -> str:
     session.commit()
     session.close()
 
+    # TODO: we need return class for all responses, e.g. Response(code=200, message="Cards taken successfully")
     return "Cards taken successfully"
 
 
