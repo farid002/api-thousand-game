@@ -188,12 +188,11 @@ def make_bid(game_id: str, player_id: str, bid: int):
 
 def take_talon(game_id: str, player_id: str) -> str:
     """
-    Allows a player to take three cards from the talon during their turn.
+    Allows a player to take talon in their turn.
 
     Args:
         game_id (str): The ID of the game.
-        player_id (int): The Global ID of the player (eg: jane.doe@example.com).
-        cards (List[Tuple[CardNumber, CardSuit]]): A list of three tuples representing the card number and suit.
+        player_id (str): The Global ID of the player (eg: jane.doe@example.com).
 
     Returns:
         str: A success message if the operation is successful, an error message otherwise.
