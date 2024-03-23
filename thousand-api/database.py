@@ -8,14 +8,9 @@ engine = create_engine("sqlite:///games.db")
 Session = sessionmaker(bind=engine)
 
 
-def create_tables():
-    """TODO: Write docstring"""
-    Base.metadata.create_all(engine)
-
-
 def database_init():
     """TODO: Write docstring"""
-    create_tables()
+    Base.metadata.create_all(engine)
 
 
 def update_players_db(session, players):

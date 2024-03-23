@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -29,15 +29,7 @@ class CardNumber(Enum):
     ACE = "A"
 
 
-class CardValue(Enum):
-    """Numeric value of each card"""
-
-    NINE = 0
-    JACK = 2
-    QUEEN = 3
-    KING = 4
-    TEN = 10
-    ACE = 11
+CARD_VALUES = {"9": 0, "J": 2, "Q": 3, "K": 4, "10": 10, "A": 11}
 
 
 class Pair(Enum):
@@ -81,7 +73,10 @@ class Player(Base):
     cards_played = Column(String)
     bolt_count = Column(Integer, default=0)
     barrel_count = Column(Integer, default=0)
+    round_point = Column(Integer, default=0)
+    point = Column(Integer, default=0)
     max_biddable_amount = Column(Integer, default=120)
+    silent = Column(Boolean, default=False)
 
     @property
     def cards_init_list(self):
@@ -163,8 +158,10 @@ class Round(Base):
     talon = Column(String, default="")
     bid_starter = Column(Integer, default=0)  # player local id
     bids = Column(String, default="0,0,0")  # "p1bid,p2bid,p3bid"; 0: new, -1: pass, >100: bid_amount.i.e.: "100,-1,110"
-    bid_winner = Column(Integer)  # player local id
+    bid_winner = Column(Integer, default=-1)  # player local id
     final_bid_amount = Column(Integer, default=0)
+    trick = Column(String, default="0,0,0")
+    trick_turn = Column(Integer, default=-1)
 
     game = relationship("Game", foreign_keys="Round.game_id")
 
@@ -208,3 +205,13 @@ class Round(Base):
     def bids_list(self, value):
         """Tbd"""
         self.bids = ",".join(value) if value else ""
+
+    @property
+    def trick_list(self):
+        """Tbd"""
+        return self.trick.split(",") if self.trick else []
+
+    @trick_list.setter
+    def trick_list(self, value):
+        """Tbd"""
+        self.trick = ",".join(value) if value else ""
