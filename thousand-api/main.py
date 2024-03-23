@@ -9,19 +9,19 @@ app = FastAPI()
 
 
 @app.get("/start_round")
-def start_round_endpoint(game_id: str):
+def start_round_endpoint(game_id: str = "game1"):
     """TODO: Write docstring"""
     return start_round(game_id=game_id)
 
 
 @app.put("/make_bid")
-def make_bid_endpoint(game_id: str, player_id: str, bid: int):
+def make_bid_endpoint(game_id: str = "game1", player_id: str = "farid", bid: int = 100):
     """TODO: Write docstring"""
     return make_bid(game_id, player_id, bid)
 
 
 @app.put("/pass_bid")
-def pass_bid_endpoint(game_id: str, player_id: str):
+def pass_bid_endpoint(game_id: str = "game1", player_id: str = "farid"):
     """Passing during the bidding"""
     return pass_bid(game_id, player_id)
 
@@ -38,26 +38,26 @@ def give_two_cards_endpoint(player: str, card: str):
     return give_two_cards(player, card)
 
 
-@app.put("/make_last_bid")
-def make_last_bid_endpoint(player: str, last_bid: int):
+@app.put("/make_final_bid")
+def make_final_bid_endpoint(game_id: str, player_id: str = "farid", final_bid: int = 120):
     """TODO: Write docstring"""
-    return make_last_bid(player, last_bid)
+    return make_final_bid(game_id, player_id, final_bid)
 
 
 @app.put("/play_card")
-def play_card_endpoint(player: str, card: str):
+def play_card_endpoint(game_id: str, player_id: str, card: str):
     """TODO: Write docstring"""
-    return play_card(player, card)
+    return play_card(game_id, player_id, card)
 
 
 @app.put("/finalize_round")
-def finalize_round_endpoint(player: str, card: str):
+def finalize_round_endpoint(game_id: str):
     """TODO: Write docstring"""
-    return finalize_round(player, card)
+    return finalize_round(game_id)
 
 
 @app.get("/game")
-def get_game_endpoint(game_id: str):
+def get_game_endpoint(game_id: str = "game1"):
     """TODO: Write docstring"""
     return get_game(game_id)
 
