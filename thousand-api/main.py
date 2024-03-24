@@ -27,9 +27,9 @@ def pass_bid_endpoint(game_id: str = "game1", player_id: str = "farid"):
 
 
 @app.put("/take_talon")
-def take_talon_endpoint(game_id: str, player_local_id: str):
+def take_talon_endpoint(game_id: str, player_id: str):
     """TODO: Write docstring"""
-    return take_talon(game_id, player_local_id)
+    return take_talon(game_id, player_id)
 
 
 @app.put("/give_two_cards")

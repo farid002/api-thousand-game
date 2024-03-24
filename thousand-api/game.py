@@ -228,27 +228,19 @@ def take_talon(game_id: str, player_id: str) -> str:
     """
     session = Session()
     curr_round_obj = get_current_round_from_db(session, game_id)
-    cards = get_current_round_from_db(Session(), game_id).talon.split(",")
-
     if not curr_round_obj:
         session.close()
         return "Round not found"
 
+    cards = curr_round_obj.talon.split(",")
     if len(cards) != 3:
         session.close()
-        return "You must take exactly three cards"
+        return "Talon doesn't have 3 cards"
 
-    player = session.query(Player).filter_by(id=player_id).first()
-
+    player = get_player_from_db(session, player_id)
     if not player:
         session.close()
         return "Player not found"
-
-    # check whether cards are in talon
-    for card in cards:
-        if card not in curr_round_obj.talon_list:
-            session.close()
-            return f"Invalid card: {card}"
 
     # add the card to player's hand
     player.cards_current_list = player.cards_current_list + cards
