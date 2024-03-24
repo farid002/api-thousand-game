@@ -215,9 +215,51 @@ def pass_bid(game_id: str, player_id: str):
     return "Passed bidding successfully"
 
 
-def take_three_cards(player, card):
-    """TODO: Write docstring"""
-    return
+def take_talon(game_id: str, player_id: str) -> str:
+    """
+    Allows a player to take talon in their turn.
+
+    Args:
+        game_id (str): The ID of the game.
+        player_id (str): The Global ID of the player (eg: jane.doe@example.com).
+
+    Returns:
+        str: A success message if the operation is successful, an error message otherwise.
+    """
+    session = Session()
+    curr_round_obj = get_current_round_from_db(session, game_id)
+    cards = get_current_round_from_db(Session(), game_id).talon.split(",")
+
+    if not curr_round_obj:
+        session.close()
+        return "Round not found"
+
+    if len(cards) != 3:
+        session.close()
+        return "You must take exactly three cards"
+
+    player = session.query(Player).filter_by(id=player_id).first()
+
+    if not player:
+        session.close()
+        return "Player not found"
+
+    # check whether cards are in talon
+    for card in cards:
+        if card not in curr_round_obj.talon_list:
+            session.close()
+            return f"Invalid card: {card}"
+
+    # add the card to player's hand
+    player.cards_current_list = player.cards_current_list + cards
+
+    session.add(curr_round_obj)
+    session.add(player)
+    session.commit()
+    session.close()
+
+    # TODO: we need return class for all responses, e.g. Response(code=200, message="Cards taken successfully")
+    return "Cards taken successfully"
 
 
 def give_two_cards(player, card):
