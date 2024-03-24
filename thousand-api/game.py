@@ -254,9 +254,59 @@ def take_talon(game_id: str, player_id: str) -> str:
     return "Cards taken successfully"
 
 
-def give_two_cards(player, card):
-    """TODO: Write docstring"""
-    return
+def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
+    """Gives first card to next player, second card to previous player
+
+    Args:
+        game_id(str): Game ID
+        player_id(str): Global ID of current player
+    """
+    session = Session()
+    curr_round_obj = get_current_round_from_db(session, game_id)
+
+    game = session.query(Game).filter_by(id=game_id).first()
+    players = get_players_with_game_from_db(session, game)  # [ 0 1 2 ]
+    curr_player = get_player_from_db(session, player_id)
+    curr_player_local_id = curr_player.local_id
+
+    # TODO: check for cards in talon
+    talon = curr_round_obj.talon_list
+    if card1 and card2 not in talon:
+        session.close()
+        return "Cards not in talon, can't give them to other players"
+
+    # check whether cards are in player's hand
+    curr_player_cards_temp = curr_player.cards_current_list
+    if card1 not in curr_player_cards_temp or card2 not in curr_player_cards_temp:
+        session.close()
+        return "Cards not in player's hand"
+
+    if len(curr_player_cards_temp) != 10:
+        session.close()
+        return "Player doesn't have 10 cards to give 2 of them"
+
+    # remove cards from current player
+    curr_player_cards_temp.remove(card1)
+    curr_player_cards_temp.remove(card2)
+    curr_player.cards_current_list = curr_player_cards_temp
+
+    # give card1 to next player
+    next_player_local_id = int((curr_player_local_id + 1) % 3)
+    next_player = players[next_player_local_id]
+    next_player.cards_current_list += card1
+
+    # give card2 to previous player
+    prev_player_local_id = int((curr_player_local_id + 2) % 3)
+    prev_player = players[prev_player_local_id]
+    prev_player.cards_current_list += card2
+
+    session.add(curr_round_obj)
+    session.add(next_player)
+    session.add(prev_player)
+    session.commit()
+    session.close()
+
+    return "Cards given successfuly"
 
 
 def make_final_bid(game_id: str, player_id: str, final_bid: int):
