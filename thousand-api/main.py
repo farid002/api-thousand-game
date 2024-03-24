@@ -33,9 +33,9 @@ def take_three_cards_endpoint(player: str, card: str):
 
 
 @app.put("/give_two_cards")
-def give_two_cards_endpoint(player: str, card: str):
+def give_two_cards_endpoint(game_id: str, player_id: str, card1: str, card2: str):
     """TODO: Write docstring"""
-    return give_two_cards(player, card)
+    return give_two_cards(game_id, player_id, card1, card2)
 
 
 @app.put("/make_final_bid")
