@@ -269,12 +269,6 @@ def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
     curr_player = get_player_from_db(session, player_id)
     curr_player_local_id = curr_player.local_id
 
-    # TODO: check for cards in talon
-    talon = curr_round_obj.talon_list
-    if card1 and card2 not in talon:
-        session.close()
-        return "Cards not in talon, can't give them to other players"
-
     # check whether cards are in player's hand
     curr_player_cards_temp = curr_player.cards_current_list
     if card1 not in curr_player_cards_temp or card2 not in curr_player_cards_temp:
