@@ -1,14 +1,15 @@
 """TODO: Write docstring"""
 
 import uvicorn
-from database import database_init
 from fastapi import FastAPI
-from game import *
+
+from thousand_api.database import database_init
+from thousand_api.game import *
 
 app = FastAPI()
 
 
-@app.get("/start_round")
+@app.put("/start_round")
 def start_round_endpoint(game_id: str = "game1"):
     """TODO: Write docstring"""
     return start_round(game_id=game_id)
@@ -60,6 +61,12 @@ def finalize_round_endpoint(game_id: str):
 def get_game_endpoint(game_id: str = "game1"):
     """TODO: Write docstring"""
     return get_game(game_id)
+
+
+@app.get("/round/bid_winner")
+def get_bid_winner_local_id_endpoint(game_id: str = "game1"):
+    """TODO: Write docstring"""
+    return get_bid_winner_local_id(game_id)
 
 
 @app.put("/game")

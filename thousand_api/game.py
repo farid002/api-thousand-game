@@ -5,15 +5,14 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from database import (
+from thousand_api.database import (
     Session,
     get_current_round_from_db,
     get_player_from_db,
     get_players_with_game_from_db,
 )
-from helper import find_trick_winner
-from model import *
-from model import CardNumber, CardSuit, Game, Player, Round
+from thousand_api.helper import find_trick_winner
+from thousand_api.model import *
 
 
 def create_game(game_id: str, players_ids: List[str]):
@@ -54,6 +53,20 @@ def get_game(game_id: str):
 
     if game:
         return game
+    else:
+        return None
+
+
+def get_bid_winner_local_id(game_id: str):
+    """TODO: Write docstring"""
+    session = Session()
+    game = session.query(Game).filter_by(id=game_id).first()
+    round_number = game.current_round
+    curr_round = session.query(Round).filter_by(game_id=game_id, round_number=round_number).first()
+    session.close()
+
+    if curr_round:
+        return curr_round.bid_winner
     else:
         return None
 
@@ -260,6 +273,8 @@ def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
     Args:
         game_id(str): Game ID
         player_id(str): Global ID of current player
+        card1 (str): 1st card to be given
+        card2 (str): 2nd card to be given
     """
     session = Session()
     curr_round_obj = get_current_round_from_db(session, game_id)
@@ -287,12 +302,12 @@ def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
     # give card1 to next player
     next_player_local_id = int((curr_player_local_id + 1) % 3)
     next_player = players[next_player_local_id]
-    next_player.cards_current_list += card1
+    next_player.cards_current_list += [card1]
 
     # give card2 to previous player
     prev_player_local_id = int((curr_player_local_id + 2) % 3)
     prev_player = players[prev_player_local_id]
-    prev_player.cards_current_list += card2
+    prev_player.cards_current_list += [card2]
 
     session.add(curr_round_obj)
     session.add(next_player)
@@ -347,6 +362,17 @@ def play_card(game_id: str, player_id: str, card: str):
     if card not in player.cards_current_list:
         return "ERROR: player does not have such card"
 
+    # handle pair registration
+    if trick == ["0", "0", "0"] and len(player.cards_played_list) > 0:
+        if (
+            card[0] == "K"
+            and f"Q{card[-1]}" in player.cards_current_list
+            or card[0] == "Q"
+            and f"K{card[-1]}" in player.cards_current_list
+        ):
+            round_obj.activated_pair = card[-1]
+            player.round_point += PairValue[SUIT_MAPPING.get(card[-1])].value
+
     trick[player.local_id] = card
     temp_cards_played = player.cards_played_list
     temp_cards_played.append(card)
@@ -366,6 +392,10 @@ def play_card(game_id: str, player_id: str, card: str):
 
         if not player.cards_current:  # round finished
             finalize_round(game_id)
+            game.game_state = GameState.ROUND_FINISHED.value
+            session.add(round_obj)
+            session.commit()
+            session.close()
             return "Round finished"
     else:
         round_obj.trick_list = trick

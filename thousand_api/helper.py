@@ -1,6 +1,6 @@
 """Python module to store helper and utility functions"""
 
-from model import CARD_VALUES
+from thousand_api.model import CARD_VALUES
 
 
 def is_card_bigger(first_card, second_card, activated_pair):
@@ -33,10 +33,18 @@ def find_trick_winner(trick, player_local_id, activated_pair):
         return player_local_id
 
     elif next_player_card_suit == player_card_suit:
-        if prev_player_card_suit != player_card_suit:
-            return next_player_local_id
-        elif next_player_card_value > prev_player_card_value:
-            return next_player_local_id
+        if prev_player_card_suit != activated_pair:
+            if prev_player_card_suit != player_card_suit:
+                return next_player_local_id
+            elif next_player_card_value > prev_player_card_value:
+                return next_player_local_id
+            else:
+                return prev_player_local_id
+        elif next_player_card_suit == activated_pair:
+            if next_player_card_value > prev_player_card_value:
+                return next_player_local_id
+            else:
+                return prev_player_local_id
         else:
             return prev_player_local_id
 

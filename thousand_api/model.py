@@ -30,6 +30,7 @@ class CardNumber(Enum):
 
 
 CARD_VALUES = {"9": 0, "J": 2, "Q": 3, "K": 4, "10": 10, "A": 11}
+SUIT_MAPPING = {"♥": "HEART", "♦": "DIAMOND", "♧": "CLUB", "♤": "SPADE"}
 
 
 class Pair(Enum):
@@ -58,6 +59,7 @@ class GameState(Enum):
     BIDDING = "bidding"
     TALON = "talon"
     REBIDDING = "rebidding"
+    ROUND_FINISHED = "round_finished"
     FINISHED = "finished"
 
 
