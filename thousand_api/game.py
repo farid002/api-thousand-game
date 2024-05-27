@@ -418,11 +418,49 @@ def finalize_round(game_id: str):
     round_obj = get_current_round_from_db(session, game_id)
     players = get_players_with_game_from_db(session, game)
 
-    # assign bid winners point, either decrease or increase by bid amount
+    # bid winner wins the round
     if players[round_obj.bid_winner].round_point >= round_obj.final_bid_amount:
-        players[round_obj.bid_winner].point += round_obj.final_bid_amount
+
+        if (
+            players[round_obj.bid_winner].point
+            < 880
+            <= players[round_obj.bid_winner].point + round_obj.final_bid_amount
+        ):
+            players[round_obj.bid_winner].point = 880
+            players[round_obj.bid_winner].on_barrel_since += 1
+            round_obj.on_barrel = round_obj.bid_winner
+
+        elif (
+            players[round_obj.bid_winner].point == 880
+            and players[round_obj.bid_winner].point + round_obj.final_bid_amount < 1000
+        ):
+            players[round_obj.bid_winner].on_barrel_since += 1
+
+        else:
+            players[round_obj.bid_winner].point += round_obj.final_bid_amount
+
+        # wins whole game
+        if players[round_obj.bid_winner].point >= 1000:
+            finalize_game(game_id)
+
+    # bid winner loses
     else:
-        players[round_obj.bid_winner].point -= round_obj.final_bid_amount
+
+        # if point was 880, fell from barrel
+        if players[round_obj.bid_winner].point == 880:
+            players[round_obj.bid_winner].barrel_count += 1
+            players[round_obj.bid_winner].on_barrel_since = 0
+            round_obj.on_barrel = -1
+
+        # if barrel count is 3, reset the point
+        if players[round_obj.bid_winner].barrel_count == 3:
+            players[round_obj.bid_winner].barrel_count = 0
+            players[round_obj.bid_winner].on_barrel_since = 0
+            players[round_obj.bid_winner].point = 0
+            players[round_obj.bid_winner].bolt_count = 0
+
+        else:
+            players[round_obj.bid_winner].point -= round_obj.final_bid_amount
 
     for player in players:
         # assign bolts and decrease by 120 if bolt_count is 3
@@ -444,3 +482,8 @@ def finalize_round(game_id: str):
     session.commit()
     session.close()
     return
+
+
+def finalize_game(game_id: str):
+    """TODO: Write docstring"""
+    pass

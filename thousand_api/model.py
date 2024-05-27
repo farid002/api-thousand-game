@@ -75,6 +75,7 @@ class Player(Base):
     cards_played = Column(String)
     bolt_count = Column(Integer, default=0)
     barrel_count = Column(Integer, default=0)
+    on_barrel_since = Column(Integer, default=0)
     round_point = Column(Integer, default=0)
     point = Column(Integer, default=0)
     max_biddable_amount = Column(Integer, default=120)
