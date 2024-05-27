@@ -32,7 +32,17 @@ Class Diagram of the API has been illustrated below.
  - Update the **.drawio** file under **/assets** folder on https://app.diagrams.net/ accordingly
  - Export as JPG with 20 margin and replace the /assets/er-diagram.jpg 
 
-
+## Docker setup
+- Follow the Docker installation (for WSL) as in https://dataedo.com/docs/installing-docker-on-windows-via-wsl
+- Build Docker Image: 
+   ```
+   docker build -t thousandapi .
+   ```
+- Run container with the built Image: 
+   ```
+   docker run -d --name thousandapi_container -p 5001:5001 thousandapi
+   ```
+- (additional) Get IP Address with: ```ip addr show eth0 | grep inet```
 ## Contribution
 - Don't forget to activate pre-commit locally (as stated on Setup steps)
 - Follow correct naming conventions, especially PEP8 standards. Check further on: https://peps.python.org/pep-0008/
