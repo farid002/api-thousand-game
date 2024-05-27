@@ -77,4 +77,4 @@ async def create_game_endpoint(game_id: str, players: List[str]):
 
 if __name__ == "__main__":
     database_init()
-    uvicorn.run(app, host="localhost", port=5000)
+    uvicorn.run(app, host="localhost", port=5001)

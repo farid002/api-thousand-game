@@ -40,7 +40,7 @@ Class Diagram of the API has been illustrated below.
    ```
 - Run container with the built Image: 
    ```
-   docker run -d --name thousandapi_container -p 5005:5005 thousandapi
+   docker run -d --name thousandapi_container -p 5001:5001 thousandapi
    ```
 - (additional) Get IP Address with: ```ip addr show eth0 | grep inet```
 ## Contribution
