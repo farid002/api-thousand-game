@@ -29,8 +29,7 @@ Class Diagram of the API has been illustrated below.
 ![Alt Text](assets/er-diagram.jpg)
 
 **DID YOU MODIFY ANYTHING RELATED DATABASE?**
- - Update the **.drawio** file under **/assets** folder on https://app.diagrams.net/ accordingly
- - Export as JPG with 20 margin and replace the /assets/er-diagram.jpg 
+ - Follow the instructions on "Additional" section!
 
 ## Docker setup
 - Follow the Docker installation (for WSL) as in https://dataedo.com/docs/installing-docker-on-windows-via-wsl
@@ -48,3 +47,17 @@ Class Diagram of the API has been illustrated below.
 - Follow correct naming conventions, especially PEP8 standards. Check further on: https://peps.python.org/pep-0008/
 - Create branch with a special pattern: **<issue_type>/<github_issue_no>/<short_desc>**. Issue type can only be: feature, bugfix or other. Sample branch name: **feature/2/get_talon_function**
 - After branch is ready to merge with develop branch, please create a Pull Request (PR) and assign Farid Huseynov as a reviewer.
+
+## Additional
+### How to generate ER Diagram
+ - Download and install Graphviz 64bit exe for Windows from https://www.graphviz.org/download/ 
+ - Then: pip download pygraphviz
+ - extract it
+ - cd pygraphviz-1.13
+ - python setup.py build_ext --include-dirs="C:\Program Files\Graphviz\include" --library-dirs="C:\Program Files\Graphviz\lib"
+ - python setup.py install
+ - done!
+
+
+ - install eralchemy: pip install eralchemy2
+ - generate UML: eralchemy2 -i sqlite:///games.db -o er-diagram.jpg
