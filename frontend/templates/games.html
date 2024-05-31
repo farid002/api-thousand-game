@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Games</h1>
+<table id="gamesTable" class="display">
+    <thead>
+        <tr>
+            <th>Creation date</th>
+            <th>ID</th>
+            <th>Player 1</th>
+            <th>Player 2</th>
+            <th>Player 3</th>
+            <th>Game State</th>
+            <th>Current round</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for game in games %}
+    <tr>
+        <td>{{ game.creation_date }}</td>
+        <td>{{ game.id }}</td>
+        <td>{{ game.player0_id }}</td>
+        <td>{{ game.player1_id }}</td>
+        <td>{{ game.player2_id }}</td>
+        <td>{{ game.game_state }}</td>
+        <td>{{ game.current_round }}</td>
+        <td>
+            <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal" data-id="{{ game.id }}">
+                <i class="fas fa-edit"></i>
+            </button>
+            <a href="{{ url_for('delete_game', game_id=game.id) }}" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Game</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="form-group">
+            <label for="editGameId">ID</label>
+            <input type="text" class="form-control" id="editGameId" required>
+          </div>
+          <div class="form-group">
+            <label for="editPlayer0Id">Player 1</label>
+            <input type="text" class="form-control" id="editPlayer0Id" required>
+          </div>
+          <div class="form-group">
+            <label for="editPlayer1Id">Player 2</label>
+            <input type="text" class="form-control" id="editPlayer1Id" required>
+          </div>
+          <div class="form-group">
+            <label for="editPlayer2Id">Player 3</label>
+            <input type="text" class="form-control" id="editPlayer2Id" required>
+          </div>
+          <div class="form-group">
+            <label for="editGameState">Game State</label>
+            <input type="text" class="form-control" id="editGameState" required>
+          </div>
+          <div class="form-group">
+            <label for="editCurrentRound">Current Round</label>
+            <input type="text" class="form-control" id="editCurrentRound" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#gamesTable').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "order": [[0, "desc"]] // Sort by the first column (Creation date) in descending order by default
+    });
+
+    $('.edit-btn').on('click', function() {
+        const gameId = $(this).data('id');
+        $.get(`/game/${gameId}`, function(data) {
+            $('#editGameId').val(data.id);
+            $('#editPlayer0Id').val(data.player0_id);
+            $('#editPlayer1Id').val(data.player1_id);
+            $('#editPlayer2Id').val(data.player2_id);
+            $('#editGameState').val(data.game_state);
+            $('#editCurrentRound').val(data.current_round);
+        });
+    });
+
+    $('#editForm').on('submit', function(event) {
+        event.preventDefault();
+        const gameId = $('#editGameId').val();
+        const updatedGame = {
+            player0_id: $('#editPlayer0Id').val(),
+            player1_id: $('#editPlayer1Id').val(),
+            player2_id: $('#editPlayer2Id').val(),
+            game_state: $('#editGameState').val(),
+            current_round: $('#editCurrentRound').val()
+        };
+
+        $.ajax({
+            url: `/game/${gameId}/edit`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(updatedGame),
+            success: function() {
+                $('#editModal').modal('hide');
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                // Handle error here
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

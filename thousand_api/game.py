@@ -15,9 +15,10 @@ from thousand_api.helper import find_trick_winner
 from thousand_api.model import *
 
 
-def create_game(game_id: str, players_ids: List[str]):
+def create_game(players_ids: List[str]):
     """TODO: Write docstring"""
     session = Session()
+    game_id = str(uuid.uuid4())
 
     game = Game(
         id=game_id,
@@ -42,7 +43,7 @@ def create_game(game_id: str, players_ids: List[str]):
 
     session.close()
 
-    return players_ids
+    return game_id
 
 
 def get_game(game_id: str):
@@ -53,6 +54,75 @@ def get_game(game_id: str):
 
     if game:
         return game
+    else:
+        return None
+
+
+def delete_game(game_id):
+    """
+    Delete a game from the database by its ID.
+
+    Args:
+        game_id (int): The ID of the game to delete.
+
+    Returns:
+        bool: True if the game was deleted successfully, False otherwise.
+    """
+    session = Session()
+    try:
+        game = session.query(Game).filter_by(id=game_id).first()
+        if game:
+            session.delete(game)
+            session.commit()
+            return True
+        return False
+    except Exception as e:
+        session.rollback()
+        print(f"Error deleting game: {e}")
+        return False
+    finally:
+        session.close()
+
+
+def update_game(game_id, player0_id, player1_id, player2_id):
+    """
+    Update a game in the database.
+
+    Args:
+        game_id (int): The ID of the game to update.
+        player0_id (int): ID of player 1.
+        player1_id (int): ID of player 2.
+        player2_id (int): ID of player 3.
+
+    Returns:
+        bool: True if the game was updated successfully, False otherwise.
+    """
+    session = Session()
+    try:
+        game = session.query(Game).filter_by(id=game_id).first()
+        if game:
+            game.player0_id = player0_id
+            game.player1_id = player1_id
+            game.player2_id = player2_id
+            session.commit()
+            return True
+        return False
+    except Exception as e:
+        session.rollback()
+        print(f"Error updating game: {e}")
+        return False
+    finally:
+        session.close()
+
+
+def get_games():
+    """TODO: Write docstring"""
+    session = Session()
+    games = session.query(Game).all()
+    session.close()
+
+    if games:
+        return games
     else:
         return None
 
