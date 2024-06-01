@@ -4,7 +4,7 @@ import requests
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-FASTAPI_URL = "http://127.0.0.1:5001"
+FASTAPI_URL = "http://127.0.0.1:5002"
 
 
 @app.route("/")
