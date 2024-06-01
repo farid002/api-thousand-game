@@ -3,10 +3,10 @@
 import uvicorn
 from fastapi import FastAPI
 
-from thousand_api.database import database_init
-from thousand_api.game import *
-from thousand_api.game_utils import router as games_router
-from thousand_api.players_utils import router as player_router
+from thousand_api.core.game_core import *
+from thousand_api.db.database import database_init
+from thousand_api.endpoints.game import router as games_router
+from thousand_api.endpoints.player import router as player_router
 
 app = FastAPI()
 

@@ -49,13 +49,13 @@ if __name__ == "__main__":
     for i in range(len(bid_sequence)):
         print(
             requests.put(
-                "http://localhost:5001/make_bid",
+                f"http://localhost:5001/game/{game_id}/make_bid",
                 params={"game_id": game_id, "player_id": players_ids[bid_player_sequence[i]], "bid": bid_sequence[i]},
             )
         )
     print(
         requests.put(
-            "http://localhost:5001/pass_bid",
+            f"http://localhost:5001/game/{game_id}/pass_bid",
             params={"game_id": game_id, "player_id": players_ids[2]},
         )
     )
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # taking talon (3 cards)
     print(
         requests.put(
-            "http://localhost:5001/take_talon",
+            f"http://localhost:5001/game/{game_id}/take_talon",
             params={"game_id": game_id, "player_id": players_ids[0]},
         )
     )
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # giving two cards from bid winner to the other 2 players
     print(
         requests.put(
-            "http://localhost:5001/give_two_cards",
+            f"http://localhost:5001/game/{game_id}/give_two_cards",
             params={"game_id": game_id, "player_id": players_ids[0], "card1": "Q♦", "card2": "J♤"},
         )
     )
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # making final bid for the bid winner
     print(
         requests.put(
-            "http://localhost:5001/make_final_bid",
+            f"http://localhost:5001/game/{game_id}/make_final_bid",
             params={"game_id": game_id, "player_id": players_ids[0], "final_bid": 160},
         )
     )
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     for i in range(24):
         print(
             requests.put(
-                "http://localhost:5001/play_card",
+                f"http://localhost:5001/game/{game_id}/play_card",
                 params={
                     "game_id": game_id,
                     "player_id": players_ids[card_player_sequence[i]],

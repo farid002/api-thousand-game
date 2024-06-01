@@ -2,7 +2,13 @@
 
 from fastapi import APIRouter
 
-from thousand_api.game import *
+from thousand_api.utils.game_utils import (
+    delete_game,
+    get_bid_winner_local_id,
+    get_game,
+    get_games,
+    update_game,
+)
 
 router = APIRouter()
 
