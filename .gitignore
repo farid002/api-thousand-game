@@ -162,3 +162,4 @@ cython_debug/
 # Custom
 *.db
 !tests/test_db/*.db
+.DS_Store

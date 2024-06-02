@@ -33,6 +33,8 @@ Class Diagram of the API has been illustrated below.
 
 ## Docker setup
 - Follow the Docker installation (for WSL) as in https://dataedo.com/docs/installing-docker-on-windows-via-wsl
+- or for Ubuntu: https://docs.docker.com/engine/install/ubuntu/
+- Install Docker Compose as in https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04 
 - Build Docker Image: 
    ```
    docker build -t thousandapi .
