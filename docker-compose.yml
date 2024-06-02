@@ -1,8 +1,29 @@
+# docker-compose.yml
 version: '3.8'
 
 services:
-  fastapi:
-    build: .
+  fastapi-app:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Assuming FastAPI Dockerfile is in the root directory
+    container_name: thousand-api
     ports:
       - "5001:5001"
-    restart: always
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - frontend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile_Frontend
+    container_name: thousand-frontend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
