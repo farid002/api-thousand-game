@@ -1,29 +1,28 @@
-# docker-compose.yml
 version: '3.8'
 
 services:
   fastapi-app:
     build:
       context: .
-      dockerfile: Dockerfile  # Assuming FastAPI Dockerfile is in the root directory
+      dockerfile: Dockerfile
     container_name: thousand-api
     ports:
-      - "5001:5001"
-    env_file:
-      - .env
+      - "5001:5001"  # Assuming FastAPI app runs on port 5001
+    environment:
+      - APP_ENV=production  # Example environment variable for FastAPI
+      # Add more environment variables for FastAPI as needed
     volumes:
       - .:/app
-    depends_on:
-      - frontend
 
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile_Frontend
+      context: ./frontend  # Specify the context for frontend service
+      dockerfile: Dockerfile_Frontend  # Use the correct Dockerfile for frontend
     container_name: thousand-frontend
     ports:
-      - "5000:5000"
-    env_file:
-      - .env
+      - "5000:5000"  # Assuming Flask frontend runs on port 5000
+    environment:
+      - FLASK_ENV=development  # Environment variable specific to Flask
+      # Add more environment variables for Flask as needed
     volumes:
-      - .:/app
+      - ./frontend:/app  # Mount frontend directory to /app in the container

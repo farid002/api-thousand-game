@@ -60,4 +60,10 @@ Class Diagram of the API has been illustrated below.
  - Then: pip download pygraphviz
  - extract it
  - cd pygraphviz-1.13
- - python setup.py build_ext 
+ - python setup.py build_ext --include-dirs="C:\Program Files\Graphviz\include" --library-dirs="C:\Program Files\Graphviz\lib"
+ - python setup.py install
+ - done!
+
+
+ - install eralchemy: pip install eralchemy2
+ - generate UML: eralchemy2 -i sqlite:///games.db -o er-diagram.jpg
