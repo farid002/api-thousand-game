@@ -17,4 +17,4 @@ EXPOSE 80
 ENV PYTHONUNBUFFERED=1
 
 # Run uvicorn server
-CMD ["uvicorn", "thousand_api.main:app", "--host", "0.0.0.0", "--port", "5001"]
+CMD ["python", "-m", "thousand_api.main"]
