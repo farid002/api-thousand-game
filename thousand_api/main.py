@@ -70,4 +70,4 @@ app.include_router(player_router, prefix="/player", tags=["players"])
 
 if __name__ == "__main__":
     database_init()
-    uvicorn.run(app, host="localhost", port=5002)
+    uvicorn.run(app, host="0.0.0.0", port=5002)
