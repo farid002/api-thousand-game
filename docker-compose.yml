@@ -5,24 +5,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: thousand-api
+    container_name: fastapi-app
     ports:
       - "5001:5001"  # Assuming FastAPI app runs on port 5001
     environment:
-      - APP_ENV=production  # Example environment variable for FastAPI
-      # Add more environment variables for FastAPI as needed
+      - APP_ENV=production
     volumes:
       - .:/app
 
   frontend:
     build:
-      context: ./frontend  # Specify the context for frontend service
-      dockerfile: Dockerfile_Frontend  # Use the correct Dockerfile for frontend
-    container_name: thousand-frontend
+      context: .
+      dockerfile: Dockerfile_Frontend
+    container_name: flask-frontend
     ports:
       - "5000:5000"  # Assuming Flask frontend runs on port 5000
     environment:
-      - FLASK_ENV=development  # Environment variable specific to Flask
-      # Add more environment variables for Flask as needed
+      - FLASK_ENV=production
     volumes:
-      - ./frontend:/app  # Mount frontend directory to /app in the container
+      - .:/frontend

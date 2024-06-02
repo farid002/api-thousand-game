@@ -1,14 +1,17 @@
-# Dockerfile_Frontend
+# Dockerfile for Frontend
 FROM python:3.9-slim
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /frontend
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy the current directory contents into the container at /frontend
+COPY . /frontend
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Set the environment variable for Flask
+ENV FLASK_APP=app.py
 
 # Expose the port
 EXPOSE 5000
