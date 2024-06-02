@@ -9,7 +9,7 @@ from thousand_api.models.model import Base
 
 if __name__ == "__main__":
 
-    engine = create_engine("sqlite:///games.db")
+    engine = create_engine("sqlite:///tests/games.db")
     Session = sessionmaker(bind=engine)
     Base.metadata.create_all(engine)
 

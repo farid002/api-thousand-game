@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="game-info-container">
+    <h2>Game Details</h2>
+
+    <p><span class="game-info-label">Creation Date:</span> <span class="game-info-value">{{ game.creation_date }}</span>
+    </p>
+    <p><span class="game-info-label">ID:</span> <span class="game-info-value">{{ game.id }}</span></p>
+    <p><span class="game-info-label">Game State:</span> <span class="game-info-value">{{ game_state }}</span></p>
+    <p><span class="game-info-label">Current Round:</span> <span class="game-info-value">{{ game.current_round }}</span>
+    </p>
+
+    <h3>Players and Cards:</h3>
+    {% for player_id, cards in players.items() %}
+    <div class="player-card-section">
+        <p><span class="game-info-label">Player:</span> <span class="game-info-value">{{ player_id }}</span></p>
+    
+        <div class="player-cards">
+            {% for card in cards %}
+            <button class="btn btn-primary play-card-button" data-player-id="{{ player_id }}" data-card="{{ card }}" {% if
+                game_state !="PLAYING" or player_id !=current_player_id %}disabled{% endif %}>
+                {{ card }} <i class="fas fa-play"></i>
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+            const playButtons = document.querySelectorAll('.play-card-button');
+
+            const gameId = "{{ game.id }}"; // get game id from templatte
+
+            playButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const playerId = button.dataset.playerId;
+                    const card = button.dataset.card;
+
+                    fetch(`/game/${gameId}/play_card`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'game_id': gameId,
+                            'player_id': playerId,
+                            'card': card
+                        })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            button.remove();
+                        })
+                        .catch(error => {
+                            console.error('Error playing card:', error);
+                            alert('An error occurred while playing the card. Please try again.');
+                        });
+                });
+            });
+        });
+</script>
+
+{% endblock %}

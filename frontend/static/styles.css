@@ -95,3 +95,49 @@ a:hover {
     color: #007bff;
 }
 
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.game-info-container {
+    background-color: #f8f9fa;  
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);   
+    margin-bottom: 20px;
+}
+
+.game-info-label {
+    font-weight: bold;
+    margin-bottom: 5px; 
+}
+
+.game-info-value {
+    font-family: monospace;     
+}
+
+
+.player-cards button { /* Or .play-card-button if you have that class */
+    background-color: lightblue; /* Example color */
+    color: black; 
+    border: 1px solid gray;
+    padding: 8px;
+    cursor: pointer; /* Indicate that it's clickable */
+}
+
+.player-cards button:hover {
+    background-color: #0056b3; /* Example hover color */
+    color: white;
+}
+
+.player-cards button:disabled {
+    background-color: #ccc; /* Grayed-out for disabled buttons */
+    color: #666;
+    cursor: not-allowed; /* Indicate that it's not clickable */
+}

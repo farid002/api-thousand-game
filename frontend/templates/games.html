@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+</head>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <h1>Games</h1>
 <table id="gamesTable" class="display">
     <thead>
@@ -26,6 +28,9 @@
         <td>{{ game.game_state }}</td>
         <td>{{ game.current_round }}</td>
         <td>
+            <a href="{{ url_for('get_game', game_id=game.id) }}" class="btn btn-info">
+                <i class="fas fa-eye"></i>
+            </a>
             <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal" data-id="{{ game.id }}">
                 <i class="fas fa-edit"></i>
             </button>

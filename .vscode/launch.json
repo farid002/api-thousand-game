@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Test API",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "tests.start_test_api:app",
+                "--reload",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "5001",
+                "--log-level",
+                "debug"
+            ],
+            "jinja": true,
+            "justMyCode": false
+        },
+         {
+            "name": "Debug: Game UI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "gunicorn",
+            "args": [
+                "frontend.app:app",
+                "-b",
+                "0.0.0.0:8000",
+            ],
+            "jinja": true,
+            "justMyCode": false
+        }
+    ]
+}
+

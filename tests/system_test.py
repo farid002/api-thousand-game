@@ -6,10 +6,10 @@ import shutil
 import requests
 
 if __name__ == "__main__":
-    if os.path.exists("games.db"):
-        os.remove("games.db")
+    if os.path.exists("tests/games.db"):
+        os.remove("tests/games.db")
 
-    shutil.copyfile("test_db/games.db", "games.db")
+    shutil.copyfile("tests/test_db/games.db", "tests/games.db")
     game_id = "game1"
     players_ids = ["farid", "huseyn", "samir"]
     headers = {"accept": "application/json"}
