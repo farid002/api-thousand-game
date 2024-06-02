@@ -22,4 +22,4 @@ jobs:
         script: |
           cd ~/repos/api-thousand-game
           git pull
-          docker-compose up -d --build
+          docker compose up -d --build
