@@ -41,7 +41,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Edit Game</h5>
+        <h5 class="modal-title" id="editModalLabel">Edit Player</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -50,15 +50,35 @@
         <form id="editForm">
           <div class="form-group">
             <label for="editPlayerId">ID</label>
-            <input type="text" class="form-control" id="editPlayerId" required>
+            <input type="text" class="form-control" id="editPlayerId" required disabled>
+          </div>
+          <div class="form-group">
+            <label for="editLocalId">Local ID</label>
+            <input type="text" class="form-control" id="editLocalId" required>
           </div>
           <div class="form-group">
             <label for="editCardsInit">Cards Init</label>
-            <input type="text" class="form-control" id="editCardsInit" required>
+            <input type="text" class="form-control" id="editCardsInit">
+          </div>
+          <div class="form-group">
+            <label for="editCardsCurrent">Cards Current</label>
+            <input type="text" class="form-control" id="editCardsCurrent">
+          </div>
+          <div class="form-group">
+            <label for="editCardsPlayed">Cards Played</label>
+            <input type="text" class="form-control" id="editCardsPlayed">
+          </div>
+          <div class="form-group">
+            <label for="editBolts">Bolts</label>
+            <input type="text" class="form-control" id="editBolts" required>
           </div>
           <div class="form-group">
             <label for="editBarrels">Barrels</label>
             <input type="text" class="form-control" id="editBarrels" required>
+          </div>
+          <div class="form-group">
+            <label for="editOnBarrelSince">On barrel since</label>
+            <input type="text" class="form-control" id="editOnBarrelSince" required>
           </div>
           <div class="form-group">
             <label for="editRoundPoint">Round Point</label>
@@ -67,6 +87,10 @@
           <div class="form-group">
             <label for="editPoint">Point</label>
             <input type="text" class="form-control" id="editPoint" required>
+          </div>
+          <div class="form-group">
+            <label for="editMaxBiddableAmount">Max Biddable Amount</label>
+            <input type="text" class="form-control" id="editMaxBiddableAmount" required>
           </div>
           <div class="form-group">
             <label for="editSilent">Silent</label>
@@ -93,30 +117,42 @@ $(document).ready(function() {
         const playerId = $(this).data('id');
         $.get(`/player/${playerId}`, function(data) {
             $('#editPlayerId').val(data.id);
+            $('#editLocalId').val(data.local_id);
             $('#editCardsInit').val(data.cards_init);
+            $('#editCardsCurrent').val(data.cards_current);
+            $('#editCardsPlayed').val(data.cards_played);
+            $('#editBolts').val(data.bolt_count);
             $('#editBarrels').val(data.barrel_count);
+            $('#editOnBarrelSince').val(data.on_barrel_since);
             $('#editRoundPoint').val(data.round_point);
             $('#editPoint').val(data.point);
+            $('#editMaxBiddableAmount').val(data.max_biddable_amount);
             $('#editSilent').val(data.silent);
         });
     });
 
     $('#editForm').on('submit', function(event) {
         event.preventDefault();
-        const gameId = $('#editGameId').val();
-        const updatedGame = {
-            player0_id: $('#editPlayer0Id').val(),
-            player1_id: $('#editPlayer1Id').val(),
-            player2_id: $('#editPlayer2Id').val(),
-            game_state: $('#editGameState').val(),
-            current_round: $('#editCurrentRound').val()
+        const playerId = $('#editPlayerId').val();
+        const updatedPlayer = {
+            local_id: $('#editLocalId').val(),
+            cards_init: $('#editCardsInit').val(),
+            cards_current: $('#editCardsCurrent').val(),
+            cards_played: $('#editCardsPlayed').val(),
+            bolt_count: $('#editBolts').val(),
+            barrel_count: $('#editBarrels').val(),
+            on_barrel_since: $('#editOnBarrelSince').val(),
+            round_point: $('#editRoundPoint').val(),
+            point: $('#editPoint').val(),
+            max_biddable_amount: $('#editMaxBiddableAmount').val(),
+            silent: $('#editSilent').val()
         };
 
         $.ajax({
-            url: `/game/${gameId}/edit`,
+            url: `/player/${playerId}/edit`,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify(updatedGame),
+            data: JSON.stringify(updatedPlayer),
             success: function() {
                 $('#editModal').modal('hide');
                 location.reload();

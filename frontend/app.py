@@ -70,6 +70,35 @@ def get_player(player_id):
     return player
 
 
+@app.route("/player/<player_id>/edit", methods=["GET", "POST"])
+def edit_player(player_id):
+    """TODO: Write docstring"""
+    if request.method == "POST":
+        player_data = request.json
+        local_id = player_data["local_id"]
+        cards_init = player_data["cards_init"]
+        cards_current = player_data["cards_current"]
+        cards_played = player_data["cards_played"]
+        bolt_count = player_data["bolt_count"]
+        barrel_count = player_data["barrel_count"]
+        on_barrel_since = player_data["on_barrel_since"]
+        round_point = player_data["round_point"]
+        point = player_data["point"]
+        max_biddable_amount = player_data["max_biddable_amount"]
+        silent = player_data["silent"]
+        requests.put(
+            f"{FASTAPI_URL}/player/{player_id}/edit?local_id={local_id}&cards_init={cards_init}"
+            f"&cards_current={cards_current}&cards_played={cards_played}&bolt_count={bolt_count}"
+            f"&barrel_count={barrel_count}&on_barrel_since={on_barrel_since}&round_point={round_point}"
+            f"&point={point}&max_biddable_amount={max_biddable_amount}&silent={silent}"
+        )
+        return redirect(url_for("get_players"))
+
+    response = requests.get(f"{FASTAPI_URL}/player/{player_id}")
+    player = response.json()
+    return player
+
+
 @app.route("/player/<player_id>/delete")
 def delete_player(player_id):
     """TODO: Write docstring"""

@@ -26,6 +26,32 @@ def delete_player_endpoint(player_id):
 
 
 @router.put("/{player_id}/edit")
-def update_player_endpoint(player_id, on_barrel_since, round_point, point, max_biddable_amount):
+def update_player_endpoint(
+        player_id,
+        local_id,
+        cards_init,
+        cards_current,
+        cards_played,
+        bolt_count,
+        barrel_count,
+        on_barrel_since,
+        round_point,
+        point,
+        max_biddable_amount,
+        silent
+    ):
     """TODO: Write docstring"""
-    return update_player(player_id, on_barrel_since, round_point, point, max_biddable_amount)
+    return update_player(
+        player_id,
+        local_id,
+        cards_init,
+        cards_current,
+        cards_played,
+        bolt_count,
+        barrel_count,
+        on_barrel_since,
+        round_point,
+        point,
+        max_biddable_amount,
+        silent
+    )
