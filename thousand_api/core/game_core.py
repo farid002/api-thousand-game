@@ -11,7 +11,16 @@ from thousand_api.db.database import (
     get_player_from_db,
     get_players_with_game_from_db,
 )
-from thousand_api.models.model import *
+from thousand_api.models.card import (
+    CARD_VALUES,
+    SUIT_MAPPING,
+    CardNumber,
+    CardSuit,
+    PairValue,
+)
+from thousand_api.models.game import Game, GameState
+from thousand_api.models.player import Player
+from thousand_api.models.round import Round
 from thousand_api.utils.helper import find_trick_winner
 
 

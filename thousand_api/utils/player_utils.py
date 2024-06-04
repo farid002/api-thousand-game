@@ -1,7 +1,9 @@
 """TODO: Write docstring"""
 
+from sqlalchemy import Boolean
+
 from thousand_api.db.database import Session
-from thousand_api.models.model import *
+from thousand_api.models.player import Player
 
 
 def get_player(player_id: str):
@@ -43,18 +45,18 @@ def delete_player(player_id):
 
 
 def update_player(
-        player_id,
-        local_id,
-        cards_init,
-        cards_current,
-        cards_played,
-        bolt_count,
-        barrel_count,
-        on_barrel_since,
-        round_point,
-        point,
-        max_biddable_amount,
-        silent: Boolean
+    player_id,
+    local_id,
+    cards_init,
+    cards_current,
+    cards_played,
+    bolt_count,
+    barrel_count,
+    on_barrel_since,
+    round_point,
+    point,
+    max_biddable_amount,
+    silent: Boolean,
 ):
     """
     Update a game in the database.

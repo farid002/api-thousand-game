@@ -3,7 +3,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from thousand_api.models.model import Base, Game, Player, Round
+from thousand_api.models.base import Base
+from thousand_api.models.game import Game
+from thousand_api.models.player import Player
+from thousand_api.models.round import Round
 
 engine = create_engine("sqlite:///games.db")
 Session = sessionmaker(bind=engine)

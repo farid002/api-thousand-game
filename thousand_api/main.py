@@ -59,7 +59,7 @@ def play_card_endpoint(game_id: str, player_id: str, card: str):
     return play_card(game_id, player_id, card)
 
 
-@app.put("game/{game_id}/finalize_round")
+@app.put("/game/{game_id}/finalize_round")
 def finalize_round_endpoint(game_id: str):
     """TODO: Write docstring"""
     return finalize_round(game_id)

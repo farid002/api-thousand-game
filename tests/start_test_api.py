@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from thousand_api.main import app
-from thousand_api.models.model import Base
+from thousand_api.models.base import Base
 
 if __name__ == "__main__":
 

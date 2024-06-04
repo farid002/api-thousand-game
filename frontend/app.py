@@ -5,6 +5,7 @@ from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
 FASTAPI_URL = "http://thousand-api:5002"
+# FASTAPI_URL = "http://localhost:5002"  # for local debugging uncomment this line
 
 
 @app.route("/")

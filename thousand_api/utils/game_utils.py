@@ -1,7 +1,8 @@
 """TODO: Write docstring"""
 
 from thousand_api.db.database import Session
-from thousand_api.models.model import Game, Round
+from thousand_api.models.game import Game
+from thousand_api.models.round import Round
 
 
 def get_game(game_id: str):
