@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Play Game</h1>
+
+<div class="form-group">
+    <label for="gameSelect">Select Game:</label>
+    <select class="form-control" id="gameSelect">
+        {% for game in games %}
+        <option value="{{ game.id }}">{{ game.id }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div id="playersContainer">
+    <!-- Players, their cards, sliders, slider values, and buttons will be displayed here -->
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#gameSelect').on('change', function() {
+        const gameId = $(this).val();
+        $.get(`/game/${gameId}`, function(gameData) {
+            $('#playersContainer').empty();
+            const players = [gameData.player0_id, gameData.player1_id, gameData.player2_id];
+
+            $.get(`http://localhost:5002/game/${gameId}/bid_winner`, function(bidWinner) {
+                players.forEach((playerId, index) => {
+                    const playerDiv = $('<div>').addClass('player').appendTo('#playersContainer');
+
+                    if (index === bidWinner) {
+                        $('<h3 style="color: green">').text(`Player ${playerId}`).appendTo(playerDiv);
+                    }
+                    else {
+                        $('<h3>').text(`Player ${playerId}`).appendTo(playerDiv);
+                    }
+                    const cardsDiv = $('<div>').addClass('cards').appendTo(playerDiv);
+
+                    if (gameData.game_state == "bidding") {
+                        // Add slider for each player
+                        const sliderDiv = $('<div>').appendTo(playerDiv);
+                        const slider = $('<input type="range">')
+                            .attr('id', `sliderPlayer${index}`)
+                            .attr('min', 100)
+                            .attr('max', 120)
+                            .attr('value', 110) // Default value
+                            .appendTo(sliderDiv);
+                        const sliderValue = $('<span>').text(slider.val()).appendTo(sliderDiv);
+
+                        // Slider change event handler
+                        slider.on('input', function() {
+                            sliderValue.text($(this).val());
+                        });
+
+                        // Add buttons for bidding and passing
+                        const buttonsDiv = $('<div>').appendTo(playerDiv);
+                        $('<button>').text('Bid').addClass('btn btn-primary').appendTo(buttonsDiv);
+                        $('<button>').text('Pass').addClass('btn btn-danger').appendTo(buttonsDiv);
+
+                        // Button click event handlers
+                        buttonsDiv.find('button').on('click', function() {
+                            const bidValue = slider.val();
+                            const action = $(this).text().toLowerCase(); // 'bid' or 'pass'
+                            const endpoint = action === 'bid' ? 'bid' : 'pass';
+                            // Call the corresponding endpoint
+                            if( action === 'bid' ) {
+                                $.ajax({
+                                    url: `http://localhost:5002/game/${gameId}/make_bid?player_id=${playerId}&bid=${bidValue}`,
+                                    type: 'PUT',
+                                    contentType: 'application/json',
+                                    success: function(response) {
+                                        alert('Bidded successfully!');
+                                        $('#gameSelect').trigger('change'); // Reload the players and their cards
+                                    },
+                                    error: function(xhr) {
+                                        alert('Failed to bid. Error: ' + xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    // Fetch and display player's cards
+                    $.get(`/player/${playerId}`, function(playerData) {
+                        const cards = playerData.cards_current.split(',');
+                        cards.forEach(card => {
+                            $('<button>')
+                                .addClass('btn btn-secondary card-btn')
+                                .text(card)
+                                .data('gameId', gameId)
+                                .data('playerId', playerId)
+                                .data('card', card)
+                                .appendTo(cardsDiv);
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    $(document).on('click', '.card-btn', function() {
+        const gameId = $(this).data('gameId');
+        const playerId = $(this).data('playerId');
+        const card = $(this).data('card');
+        $.ajax({
+            url: `http://localhost:5002/game/${gameId}/play_card`,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ player_id: playerId, card: card }),
+            success: function(response) {
+                alert('Card played successfully!');
+                $('#gameSelect').trigger('change'); // Reload the players and their cards
+            },
+            error: function(xhr) {
+                alert('Failed to play card. Error: ' + xhr.responseText);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

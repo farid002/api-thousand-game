@@ -14,6 +14,14 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/play")
+def play():
+    """TODO: Write docstring"""
+    response = requests.get(FASTAPI_URL + "/game/all")
+    games = response.json()
+    return render_template("play.html", games=games)
+
+
 @app.route("/games")
 def get_games():
     """TODO: Write docstring"""

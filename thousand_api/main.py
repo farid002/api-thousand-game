@@ -2,13 +2,22 @@
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from thousand_api.core.game_core import *
 from thousand_api.db.database import database_init
 from thousand_api.endpoints.game import router as games_router
 from thousand_api.endpoints.player import router as player_router
 
+origins = ["http://localhost:5000", "http://127.0.0.1:5000"]  # Frontend URL
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.put("/game")
