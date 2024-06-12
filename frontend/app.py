@@ -4,7 +4,7 @@ import requests
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-FASTAPI_URL = "http://thousand-api:5002"
+FASTAPI_URL = "http://http://147.78.130.54:5002"
 # FASTAPI_URL = "http://localhost:5002"  # for local debugging uncomment this line
 
 
@@ -60,7 +60,7 @@ def edit_game(game_id):
 def delete_game(game_id):
     """TODO: Write docstring"""
     requests.delete(f"{FASTAPI_URL}/game/{game_id}")
-    return redirect(url_for("index"))
+    return redirect(url_for("get_games"))
 
 
 @app.route("/players")

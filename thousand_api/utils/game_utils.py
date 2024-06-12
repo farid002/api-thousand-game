@@ -86,6 +86,32 @@ def get_games():
         return None
 
 
+def get_players(game_id: str):
+    """TODO: Write docstring"""
+    session = Session()
+    game = session.query(Game).filter(id == game_id).first()
+    session.close()
+
+    if game:
+        return [game.player0, game.player1, game.player2]
+    else:
+        return None
+
+
+def get_current_round(game_id: str):
+    """TODO: Write docstring"""
+    session = Session()
+    game = session.query(Game).filter_by(id=game_id).first()
+    round_number = game.current_round
+    curr_round = session.query(Round).filter_by(game_id=game_id, round_number=round_number).first()
+    session.close()
+
+    if curr_round:
+        return curr_round
+    else:
+        return None
+
+
 def get_bid_winner_local_id(game_id: str):
     """TODO: Write docstring"""
     session = Session()

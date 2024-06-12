@@ -29,25 +29,24 @@ def create_game(players_ids: List[str]):
     session = Session()
     game_id = str(uuid.uuid4())
 
-    game = Game(
-        id=game_id,
-        player0_id=players_ids[0],
-        player1_id=players_ids[1],
-        player2_id=players_ids[2],
-        creation_date=str(datetime.now()),
-    )
-
-    session.add(game)
-    session.commit()
-
     players = [
         Player(id=players_ids[0], local_id=0),
         Player(id=players_ids[1], local_id=1),
         Player(id=players_ids[2], local_id=2),
     ]
 
-    for player in players:
-        session.merge(player)
+    game = Game(
+        id=game_id,
+        player0_id=players_ids[0],
+        player1_id=players_ids[1],
+        player2_id=players_ids[2],
+        creation_date=str(datetime.now()),
+        player0=players[0],
+        player1=players[1],
+        player2=players[2],
+    )
+
+    session.add(game)
     session.commit()
 
     session.close()
@@ -170,11 +169,11 @@ def make_bid(game_id: str, player_id: str, bid: int):
         temp_bids_list[(player_local_id + 2) % 3] = "-1"
 
     curr_round_obj.bids_list = temp_bids_list
+    curr_round_obj.final_bid_amount = bid
 
     if temp_bids_list.count("-1") >= 2:
         game.game_state = GameState.TALON.value
         curr_round_obj.bid_winner = next((index for index, value in enumerate(temp_bids_list) if value != "-1"), None)
-        curr_round_obj.final_bid_amount = bid
 
     session.add(curr_round_obj)
     session.commit()

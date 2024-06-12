@@ -15,24 +15,26 @@
         </tr>
     </thead>
     <tbody>
-    {% for player in players %}
-    <tr>
-        <td>{{ player.id }}</td>
-        <td>{{ player.cards_init }}</td>
-        <td>{{ player.barrel_count }}</td>
-        <td>{{ player.round_point }}</td>
-        <td>{{ player.point }}</td>
-        <td>{{ player.silent }}</td>
-        <td>
-            <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal" data-id="{{ player.id }}">
-                <i class="fas fa-edit"></i>
-            </button>
-            <a href="{{ url_for('delete_player', player_id=player.id) }}" class="btn btn-danger">
-                <i class="fas fa-trash-alt"></i>
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
+    {% if players %}
+        {% for player in players %}
+        <tr>
+            <td>{{ player.id }}</td>
+            <td>{{ player.cards_init }}</td>
+            <td>{{ player.barrel_count }}</td>
+            <td>{{ player.round_point }}</td>
+            <td>{{ player.point }}</td>
+            <td>{{ player.silent }}</td>
+            <td>
+                <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal" data-id="{{ player.id }}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <a href="{{ url_for('delete_player', player_id=player.id) }}" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    {% endif %}
     </tbody>
 </table>
 
