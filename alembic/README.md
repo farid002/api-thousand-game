@@ -1,4 +1,4 @@
-Generic single-database configuration.
+!!! IT MUST BE RUN ONLY FOR THE PROD. DB IN SERVER PC !!!
 
 Generate a version with a message (not too long at all!)
 ```
