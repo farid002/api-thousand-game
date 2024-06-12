@@ -8,7 +8,7 @@ from thousand_api.models.game import Game
 from thousand_api.models.player import Player
 from thousand_api.models.round import Round
 
-engine = create_engine("sqlite:///games.db")
+engine = create_engine("sqlite:///../games.db")
 Session = sessionmaker(bind=engine)
 
 
