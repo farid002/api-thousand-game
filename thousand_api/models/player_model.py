@@ -2,8 +2,8 @@
 
 from sqlalchemy import Boolean, Column, Integer, String
 
-from thousand_api.models.base import Base
-from thousand_api.models.card import Pair, PairValue
+from thousand_api.models.base_model import Base
+from thousand_api.models.card_model import Pair, PairValue
 
 
 class Player(Base):

@@ -3,10 +3,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from thousand_api.models.base import Base
-from thousand_api.models.game import Game
-from thousand_api.models.player import Player
-from thousand_api.models.round import Round
+from thousand_api.models.base_model import Base
+from thousand_api.models.game_model import Game
+from thousand_api.models.player_model import Player
+from thousand_api.models.round_model import Round
 
 engine = create_engine("sqlite:///../games.db")
 Session = sessionmaker(bind=engine)
@@ -15,13 +15,6 @@ Session = sessionmaker(bind=engine)
 def database_init():
     """TODO: Write docstring"""
     Base.metadata.create_all(engine)
-
-
-def update_players_db(session, players):
-    """TODO: Write docstring"""
-    for player in players:
-        session.merge(player)
-    session.commit()
 
 
 def get_current_round_from_db(session, game_id) -> Round:

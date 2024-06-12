@@ -3,7 +3,7 @@
 from sqlalchemy import Boolean
 
 from thousand_api.db.database import Session
-from thousand_api.models.player import Player
+from thousand_api.models.player_model import Player
 
 
 def get_player(player_id: str):

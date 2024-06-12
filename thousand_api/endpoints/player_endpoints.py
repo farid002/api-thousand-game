@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from thousand_api.utils.player_utils import *
+from thousand_api.core.player_core import *
 
 router = APIRouter()
 

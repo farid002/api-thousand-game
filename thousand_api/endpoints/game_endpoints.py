@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from thousand_api.utils.game_utils import (
+from thousand_api.core.game_core import (
     delete_game,
     get_bid_winner_local_id,
     get_current_round,

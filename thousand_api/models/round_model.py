@@ -3,8 +3,8 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from thousand_api.models.base import Base
-from thousand_api.models.game import Game
+from thousand_api.models.base_model import Base
+from thousand_api.models.game_model import Game
 
 
 class Round(Base):

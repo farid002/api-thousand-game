@@ -1,6 +1,6 @@
 """Python module to store helper and utility functions"""
 
-from thousand_api.models.card import CARD_VALUES
+from thousand_api.models.card_model import CARD_VALUES
 
 
 def is_card_bigger(first_card, second_card, activated_pair):
