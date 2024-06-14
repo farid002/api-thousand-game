@@ -18,6 +18,17 @@ def get_player(player_id: str):
         return None
 
 
+def create_player(player_id: str):
+    """TODO: Write docstring"""
+    session = Session()
+    player = Player(id=player_id)
+    session.add(player)
+    session.commit()
+    session.close()
+
+    return player_id
+
+
 def delete_player(player_id):
     """
     Delete a game from the database by its ID.

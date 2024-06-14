@@ -4,16 +4,26 @@ import uuid
 from datetime import datetime
 
 from thousand_api.db.database import Session
+from thousand_api.models.player_model import Player
 from thousand_api.models.table_model import Table, TableState
 
 
-def create_table(entry_coins: int, reliable: bool, ace_marriage: bool, game_speed: int, password: int, till_1001: bool):
+def create_table(
+    creator_player_id: str,
+    entry_coins: int,
+    reliable: bool,
+    ace_marriage: bool,
+    game_speed: int,
+    password: int,
+    till_1001: bool,
+):
     """TODO: Write docstring"""
     session = Session()
 
     table_id = str(uuid.uuid4())
     table = Table(
         id=table_id,
+        player0_id=creator_player_id,
         creation_date=str(datetime.now()),
         table_state=TableState.CREATED.value,
         entry_coins=entry_coins,
@@ -122,3 +132,32 @@ def get_players(table_id: str):
         return [table.player0, table.player1, table.player2]
     else:
         return None
+
+
+def add_player(table_id: str, player_id: str):
+    """TODO: Write docstring"""
+    session = Session()
+    table = session.query(Table).filter_by(id=table_id).first()
+    player = session.query(Player).filter_by(id=player_id).first()
+
+    if table:
+        if table.player0_id == "" or table.player0_id is None:
+            table.player0_id = player_id
+            player.local_id = 0
+        elif table.player1_id == "" or table.player1_id is None:
+            table.player1_id = player_id
+            player.local_id = 1
+        elif table.player2_id == "" or table.player2_id is None:
+            table.player2_id = player_id
+            player.local_id = 2
+        else:
+            session.close()
+            return "No place"
+        session.add(table)
+        session.add(player)
+        session.commit()
+        session.close()
+        return "Success"
+    else:
+        session.close()
+        return "Table not found"

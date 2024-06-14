@@ -8,9 +8,9 @@ router = APIRouter()
 
 
 @router.put("/game")
-async def create_game_endpoint(players: List[str]):
+async def create_game_endpoint(table_id: str):
     """TODO: Write docstring"""
-    return create_game(players)
+    return create_game(table_id)
 
 
 @router.put("/game/{game_id}/start_round")

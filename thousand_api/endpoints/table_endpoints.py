@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from thousand_api.core.table_core import (
+    add_player,
     create_table,
     delete_table,
     get_players,
@@ -22,6 +23,7 @@ def get_tables_endpoint():
 
 @router.post("")
 def create_table_endpoint(
+    creator_player_id: str,
     entry_coins: int,
     reliable: bool = False,
     ace_marriage: bool = False,
@@ -30,7 +32,7 @@ def create_table_endpoint(
     till_1001: bool = False,
 ):
     """TODO: Write docstring"""
-    return create_table(entry_coins, reliable, ace_marriage, game_speed, password, till_1001)
+    return create_table(creator_player_id, entry_coins, reliable, ace_marriage, game_speed, password, till_1001)
 
 
 @router.get("/{table_id}")
@@ -55,3 +57,9 @@ def update_table_endpoint(table_id, player0_id, player1_id, player2_id):
 def get_players_endpoint(table_id: str):
     """TODO: Write docstring"""
     return get_players(table_id=table_id)
+
+
+@router.get("/{table_id}/player")
+def add_player_endpoint(table_id: str, player_id: str):
+    """TODO: Write docstring"""
+    return add_player(table_id=table_id, player_id=player_id)

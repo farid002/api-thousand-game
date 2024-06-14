@@ -19,6 +19,12 @@ def get_player_endpoint(player_id: str):
     return get_player(player_id)
 
 
+@router.post("/{player_id}")
+def create_player_endpoint(player_id: str):
+    """TODO: Write docstring"""
+    return create_player(player_id)
+
+
 @router.delete("/{player_id}")
 def delete_player_endpoint(player_id):
     """TODO: Write docstring"""

@@ -24,6 +24,8 @@ class Player(Base):
     max_biddable_amount = Column(Integer, default=120)
     silent = Column(Boolean, default=False)
 
+    coins = Column(Integer, default=2000)
+
     @property
     def cards_init_list(self):
         """Getter: cards_init"""

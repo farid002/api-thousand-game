@@ -21,34 +21,39 @@ from thousand_api.models.card_model import (
 from thousand_api.models.game_model import Game, GameState
 from thousand_api.models.player_model import Player
 from thousand_api.models.round_model import Round
+from thousand_api.models.table_model import Table, TableState
 from thousand_api.utils.helper import find_trick_winner
 
 
-def create_game(players_ids: List[str]):
+def create_game(table_id: str):
     """TODO: Write docstring"""
     session = Session()
     game_id = str(uuid.uuid4())
+    table = session.query(Table).filter_by(id=table_id).first()
 
-    players = [
-        Player(id=players_ids[0], local_id=0),
-        Player(id=players_ids[1], local_id=1),
-        Player(id=players_ids[2], local_id=2),
-    ]
+    if (
+        table.player0_id == ""
+        or table.player0_id is None
+        or table.player1_id == ""
+        or table.player1_id is None
+        or table.player2_id == ""
+        or table.player2_id is None
+    ):
+        return "Not enough people on the lobby to start the game"
 
     game = Game(
         id=game_id,
-        player0_id=players_ids[0],
-        player1_id=players_ids[1],
-        player2_id=players_ids[2],
+        table_id=table_id,
+        player0_id=table.player0_id,
+        player1_id=table.player1_id,
+        player2_id=table.player2_id,
         creation_date=str(datetime.now()),
-        player0=players[0],
-        player1=players[1],
-        player2=players[2],
     )
+    table.table_state = TableState.GAME_STARTED.value
 
     session.add(game)
+    session.add(table)
     session.commit()
-
     session.close()
 
     return game_id
@@ -374,11 +379,11 @@ def play_card(game_id: str, player_id: str, card: str):
         round_obj.trick_list = ["0", "0", "0"]
 
         if not player.cards_current:  # round finished
-            finalize_round(game_id)
             game.game_state = GameState.ROUND_FINISHED.value
             session.add(round_obj)
             session.commit()
             session.close()
+            finalize_round(game_id)
             return "Round finished"
     else:
         round_obj.trick_list = trick
@@ -399,7 +404,7 @@ def finalize_round(game_id: str):
         return "ERROR: Game not found"
 
     round_obj = get_current_round_from_db(session, game_id)
-    players = get_players_with_game_from_db(session, game)
+    players = [game.player0, game.player1, game.player2]
 
     # bid winner wins the round
     if players[round_obj.bid_winner].round_point >= round_obj.final_bid_amount:
@@ -424,7 +429,10 @@ def finalize_round(game_id: str):
 
         # wins whole game
         if players[round_obj.bid_winner].point >= 1000:
-            finalize_game(game_id)
+            game.game_state = GameState.FINISHED.value
+            game.winner_id = round_obj.bid_winner
+            session.add(game)
+            finalize_game(session, game_id)
 
     # bid winner loses
     else:
@@ -453,7 +461,7 @@ def finalize_round(game_id: str):
                 player.point -= 120
                 player.bolt_count = 0
         elif player.local_id != round_obj.bid_winner:
-            player.point += round(player.round_point, -1)  # assign won points except bid winner
+            player.point += (player.round_point + 5) // 10 * 10  # assign won points except bid winner
 
         # silence assignment
         player.silent = True if player.point <= -240 else False
@@ -467,6 +475,12 @@ def finalize_round(game_id: str):
     return
 
 
-def finalize_game(game_id: str):
+def finalize_game(session, game_id: str):
     """TODO: Write docstring"""
-    pass
+    game = session.query(Game).filter_by(id=game_id).first()
+
+    game.player0.coins += game.table.entry_coins * 3 * 0.8 if game.winner_id == 0 else (-1 * game.table.entry_coins)
+    game.player1.coins += game.table.entry_coins * 3 * 0.8 if game.winner_id == 1 else (-1 * game.table.entry_coins)
+    game.player2.coins += game.table.entry_coins * 3 * 0.8 if game.winner_id == 2 else (-1 * game.table.entry_coins)
+
+    session.add(game)
