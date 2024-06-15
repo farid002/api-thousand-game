@@ -20,6 +20,48 @@
 $(document).ready(function() {
     var FASTAPI_URL = "{{ FASTAPI_URL }}";
     let twoCardsToBeGiven = [];
+
+    // Event handler for card buttons
+    $(document).on('click', '.card-btn', function() {
+        const gameId = $(this).data('gameId');
+        const playerId = $(this).data('playerId');
+        const card = $(this).data('card');
+
+        const gameState = $(this).data('gameState'); // Assuming gameState is passed as a data attribute
+
+        if (gameState === 'give_two_cards') {
+            twoCardsToBeGiven.push(card);
+            if (twoCardsToBeGiven.length === 2) {
+                $.ajax({
+                    url: `${FASTAPI_URL}/game/${gameId}/give_two_cards?player_id=${playerId}&card1=${twoCardsToBeGiven[0]}&card2=${twoCardsToBeGiven[1]}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    success: function(response) {
+                        alert(response);
+                        $('#gameSelect').trigger('change'); // Reload the players and their cards
+                        twoCardsToBeGiven = []; // Reset the selected cards
+                    },
+                    error: function(xhr) {
+                        alert('Failed to give cards. Error: ' + xhr.responseText);
+                        twoCardsToBeGiven = []; // Reset the selected cards in case of an error
+                    }
+                });
+            }
+        } else {
+            $.ajax({
+                url: `${FASTAPI_URL}/game/${gameId}/play_card?player_id=${playerId}&card=${card}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                success: function(response) {
+                    $('#gameSelect').trigger('change'); // Reload the players and their cards
+                },
+                error: function(xhr) {
+                    alert('Failed to play card. Error: ' + xhr.responseText);
+                }
+            });
+        }
+    });
+
     $('#gameSelect').on('change', function() {
         const gameId = $(this).val();
         $.get(`${FASTAPI_URL}/game/${gameId}`, function(gameData) {
@@ -32,6 +74,7 @@ $(document).ready(function() {
                     $('<p>').text('Talon: ').append($(`<span class="highlight">${roundData.talon}</span>`)).appendTo(gameInfo);
                     $('<p>').text('Trick: ').append($(`<span class="highlight">${roundData.trick}</span>`)).appendTo(gameInfo);
                     $('<p>').text('Trick Turn: ').append($(`<span class="highlight">${roundData.trick_turn}</span>`)).appendTo(gameInfo);
+                    $('<p>').text('Marriage: ').append($(`<span class="highlight">${roundData.activated_pair}</span>`)).appendTo(gameInfo);
 
                     const newRoundButtonDiv = $('<div>').appendTo('#generalGameInfoContainer');
 
@@ -39,15 +82,20 @@ $(document).ready(function() {
 
                     $('#playersContainer').empty();
                     const players = [gameData.player0, gameData.player1, gameData.player2];
+                    bidsData = roundData.bids.split(',');
 
                     playersData.forEach((playerData, index) => {
                         const playerDiv = $('<div>').addClass('player').appendTo('#playersContainer');
 
-                        if (index === roundData.trick_turn) {
-                            $('<h3 style="color: green">').text(`Player ${playerData.id} : ${playerData.round_point}`).appendTo(playerDiv);
+                        if (index === roundData.trick_turn && gameData.game_state === "playing" ||
+                        roundData.bid_turn == index && gameData.game_state === "bidding") {
+                            $('<h3 style="color: green">').text(`Player ${playerData.id}: ${playerData.point} (${playerData.round_point})`).appendTo(playerDiv);
+                        }
+                        else if (bidsData[index] == "-1" && (gameData.game_state === "bidding" || gameData.game_state === "rebidding")){
+                            $('<h3 style="color: gray">').text(`Player ${playerData.id}: ${playerData.point} (${playerData.round_point})`).appendTo(playerDiv);
                         }
                         else {
-                            $('<h3>').text(`Player ${playerData.id} : ${playerData.round_point}`).appendTo(playerDiv);
+                            $('<h3>').text(`Player ${playerData.id}: ${playerData.point} (${playerData.round_point})`).appendTo(playerDiv);
                         }
                         const cardsDiv = $('<div>').addClass('cards').appendTo(playerDiv);
 
@@ -56,9 +104,9 @@ $(document).ready(function() {
                             const sliderDiv = $('<div>').appendTo(playerDiv);
                             const slider = $('<input type="range">')
                                 .attr('id', `sliderPlayer${index}`)
-                                .attr('min', roundData.final_bid_amount + 10)
+                                .attr('min', gameData.game_state === "bidding" ? roundData.final_bid_amount + 10 : roundData.final_bid_amount)
                                 .attr('max', playerData.max_biddable_amount)
-                                .attr('value', roundData.final_bid_amount + 10) // Default value
+                                .attr('value', gameData.game_state === "bidding" ? roundData.final_bid_amount + 10 : roundData.final_bid_amount) // Default value
                                 .appendTo(sliderDiv);
                             const sliderValue = $('<span>').text(slider.val()).appendTo(sliderDiv);
 
@@ -156,6 +204,7 @@ $(document).ready(function() {
                                 .data('gameId', gameId)
                                 .data('playerId', playerData.id)
                                 .data('card', card)
+                                .data('gameState', gameData.game_state) // Set the game state for the button
                                 .appendTo(cardsDiv);
                         });
                     });
@@ -173,49 +222,11 @@ $(document).ready(function() {
                             }
                         });
                     });
-                    $(document).on('click', '.card-btn', function() {
-                        const gameId = $(this).data('gameId');
-                        const playerId = $(this).data('playerId');
-                        const card = $(this).data('card');
-
-                        const gameState = gameData.game_state; // Assuming gameState is passed as a data attribute
-
-                        if (gameState === 'give_two_cards') {
-                            twoCardsToBeGiven.push(card);
-                            if (twoCardsToBeGiven.length === 2) {
-                                $.ajax({
-                                    url: `${FASTAPI_URL}/game/${gameId}/give_two_cards?player_id=${playerId}&card1=${twoCardsToBeGiven[0]}&card2=${twoCardsToBeGiven[1]}`,
-                                    type: 'PUT',
-                                    contentType: 'application/json',
-                                    success: function(response) {
-                                        alert(response);
-                                        $('#gameSelect').trigger('change'); // Reload the players and their cards
-                                        twoCardsToBeGiven = []; // Reset the selected cards
-                                    },
-                                    error: function(xhr) {
-                                        alert('Failed to give cards. Error: ' + xhr.responseText);
-                                        twoCardsToBeGiven = []; // Reset the selected cards in case of an error
-                                    }
-                                });
-                            }
-                        } else {
-                            $.ajax({
-                                url: `${FASTAPI_URL}/game/${gameId}/play_card?player_id=${playerId}&card=${card}`,
-                                type: 'PUT',
-                                contentType: 'application/json',
-                                success: function(response) {
-                                    $('#gameSelect').trigger('change'); // Reload the players and their cards
-                                },
-                                error: function(xhr) {
-                                    alert('Failed to play card. Error: ' + xhr.responseText);
-                                }
-                            });
-                        }
-                    });
                 });
             });
         });
     });
 });
+
 </script>
 {% endblock %}

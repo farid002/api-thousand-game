@@ -75,6 +75,7 @@ def start_round(game_id: str):
     players, talon = deal_cards(players)
 
     for player in players:
+        player.round_point = 0
         session.add(player)
     session.commit()
 
@@ -150,6 +151,10 @@ def make_bid(game_id: str, player_id: str, bid: int):
         session.close()
         return "The player already passed bidding"
 
+    if player_local_id != curr_round_obj.bid_turn:
+        session.close()
+        return "Not this player's turn to bid"
+
     next_player_bid = int(curr_round_obj.bids_list[(player_local_id + 1) % 3])
     prev_player_bid = int(curr_round_obj.bids_list[(player_local_id + 2) % 3])
 
@@ -175,6 +180,7 @@ def make_bid(game_id: str, player_id: str, bid: int):
 
     curr_round_obj.bids_list = temp_bids_list
     curr_round_obj.final_bid_amount = bid
+    curr_round_obj.bid_turn = (player_local_id + 1) % 3
 
     if temp_bids_list.count("-1") >= 2:
         game.game_state = GameState.TALON.value
@@ -477,6 +483,7 @@ def finalize_round(game_id: str):
         player.silent = True if player.point <= -240 else False
 
     for player in players:
+        player.round_point = 0
         session.merge(player)
 
     session.add(round_obj)
