@@ -10,7 +10,7 @@ from thousand_api.endpoints.main_endpoints import router as main_router
 from thousand_api.endpoints.player_endpoints import router as player_router
 from thousand_api.endpoints.table_endpoints import router as table_router
 
-origins = ["http://localhost:5000", "http://127.0.0.1:5000"]  # Frontend URL
+origins = ["http://localhost:5000", "http://127.0.0.1:5000", "http://147.78.130.54:5000"]  # Frontend URLs
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
