@@ -89,11 +89,12 @@ def get_games():
 def get_players(game_id: str):
     """TODO: Write docstring"""
     session = Session()
-    game = session.query(Game).filter(id == game_id).first()
+    game = session.query(Game).filter_by(id=game_id).first()
+    players = [game.player0, game.player1, game.player2]
     session.close()
 
     if game:
-        return [game.player0, game.player1, game.player2]
+        return players
     else:
         return None
 

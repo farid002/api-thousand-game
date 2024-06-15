@@ -21,30 +21,30 @@
 $(document).ready(function() {
     $('#gameSelect').on('change', function() {
         const gameId = $(this).val();
-        $.get(`http://localhost:5002/game/${gameId}`, function(gameData) {
-            $.get(`http://localhost:5002/game/${gameId}/current_round`, function(roundData) {
-                $('#generalGameInfoContainer').empty();
-                const gameInfo = $('<div class="info-paragraph">').appendTo('#generalGameInfoContainer');
-                $('<p>').text('Current Round: ').append($(`<span class="highlight">${gameData.current_round}</span>`)).appendTo(gameInfo);
-                $('<p>').text('Game State: ').append($(`<span class="highlight">${gameData.game_state}</span>`)).appendTo(gameInfo);
-                $('<p>').text('Talon: ').append($(`<span class="highlight">${roundData.talon}</span>`)).appendTo(gameInfo);
+        $.get(`http://147.78.130.54:5002/game/${gameId}`, function(gameData) {
+            $.get(`http://147.78.130.54:5002/game/${gameId}/current_round`, function(roundData) {
+                $.get(`http://147.78.130.54:5002/game/${gameId}/players`, function(playersData) {
+                    $('#generalGameInfoContainer').empty();
+                    const gameInfo = $('<div class="info-paragraph">').appendTo('#generalGameInfoContainer');
+                    $('<p>').text('Current Round: ').append($(`<span class="highlight">${gameData.current_round}</span>`)).appendTo(gameInfo);
+                    $('<p>').text('Game State: ').append($(`<span class="highlight">${gameData.game_state}</span>`)).appendTo(gameInfo);
+                    $('<p>').text('Talon: ').append($(`<span class="highlight">${roundData.talon}</span>`)).appendTo(gameInfo);
 
-                const newRoundButtonDiv = $('<div>').appendTo('#generalGameInfoContainer');
+                    const newRoundButtonDiv = $('<div>').appendTo('#generalGameInfoContainer');
 
-                $('<button>').text('New Round').addClass('btn btn-primary').appendTo(newRoundButtonDiv);
+                    $('<button>').text('New Round').addClass('btn btn-primary').appendTo(newRoundButtonDiv);
 
-                $('#playersContainer').empty();
-                const players = [gameData.player0_id, gameData.player1_id, gameData.player2_id];
+                    $('#playersContainer').empty();
+                    const players = [gameData.player0, gameData.player1, gameData.player2];
 
-                $.get(`http://localhost:5002/game/${gameId}/bid_winner`, function(bidWinner) {
-                    players.forEach((playerId, index) => {
+                    playersData.forEach((playerData, index) => {
                         const playerDiv = $('<div>').addClass('player').appendTo('#playersContainer');
 
-                        if (index === bidWinner) {
-                            $('<h3 style="color: green">').text(`Player ${playerId}`).appendTo(playerDiv);
+                        if (index === roundData.bid_winner) {
+                            $('<h3 style="color: green">').text(`Player ${playerData.id}`).appendTo(playerDiv);
                         }
                         else {
-                            $('<h3>').text(`Player ${playerId}`).appendTo(playerDiv);
+                            $('<h3>').text(`Player ${playerData.id}`).appendTo(playerDiv);
                         }
                         const cardsDiv = $('<div>').addClass('cards').appendTo(playerDiv);
 
@@ -77,7 +77,7 @@ $(document).ready(function() {
                                 // Call the corresponding endpoint
                                 if( action === 'bid' ) {
                                     $.ajax({
-                                        url: `http://localhost:5002/game/${gameId}/make_bid?player_id=${playerId}&bid=${bidValue}`,
+                                        url: `http://147.78.130.54:5002/game/${gameId}/make_bid?player_id=${playerData.id}&bid=${bidValue}`,
                                         type: 'PUT',
                                         contentType: 'application/json',
                                         success: function(response) {
@@ -91,7 +91,7 @@ $(document).ready(function() {
                                 }
                                 else if( action === 'pass' ) {
                                     $.ajax({
-                                        url: `http://localhost:5002/game/${gameId}/pass_bid?player_id=${playerId}`,
+                                        url: `http://147.78.130.54:5002/game/${gameId}/pass_bid?player_id=${playerData.id}`,
                                         type: 'PUT',
                                         contentType: 'application/json',
                                         success: function(response) {
@@ -106,32 +106,30 @@ $(document).ready(function() {
                             });
                         }
                         // Fetch and display player's cards
-                        $.get(`/player/${playerId}`, function(playerData) {
-                            const cards = playerData.cards_current.split(',');
-                            cards.forEach(card => {
-                                $('<button>')
-                                    .addClass('btn btn-secondary card-btn')
-                                    .text(card)
-                                    .data('gameId', gameId)
-                                    .data('playerId', playerId)
-                                    .data('card', card)
-                                    .appendTo(cardsDiv);
-                            });
+                        const cards = playerData.cards_current.split(',');
+                        cards.forEach(card => {
+                            $('<button>')
+                                .addClass('btn btn-secondary card-btn')
+                                .text(card)
+                                .data('gameId', gameId)
+                                .data('playerId', playerData.id)
+                                .data('card', card)
+                                .appendTo(cardsDiv);
                         });
                     });
-                });
-                newRoundButtonDiv.find('button').on('click', function() {
-                    $.ajax({
-                        url: `http://localhost:5002/game/${gameId}/start_round`,
-                        type: 'PUT',
-                        contentType: 'application/json',
-                        success: function(response) {
-                            alert('Started a new round successfully!');
-                            $('#gameSelect').trigger('change'); // Reload the players and their cards
-                        },
-                        error: function(xhr) {
-                            alert('Failed to start a new round. Error: ' + xhr.responseText);
-                        }
+                    newRoundButtonDiv.find('button').on('click', function() {
+                        $.ajax({
+                            url: `http://147.78.130.54:5002/game/${gameId}/start_round`,
+                            type: 'PUT',
+                            contentType: 'application/json',
+                            success: function(response) {
+                                alert('Started a new round successfully!');
+                                $('#gameSelect').trigger('change'); // Reload the players and their cards
+                            },
+                            error: function(xhr) {
+                                alert('Failed to start a new round. Error: ' + xhr.responseText);
+                            }
+                        });
                     });
                 });
             });
@@ -143,7 +141,7 @@ $(document).ready(function() {
         const playerId = $(this).data('playerId');
         const card = $(this).data('card');
         $.ajax({
-            url: `http://localhost:5002/game/${gameId}/play_card`,
+            url: `http://147.78.130.54:5002/game/${gameId}/play_card`,
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify({ player_id: playerId, card: card }),
