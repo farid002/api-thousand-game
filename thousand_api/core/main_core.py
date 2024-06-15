@@ -228,6 +228,11 @@ def take_talon(game_id: str, player_id: str) -> str:
         str: A success message if the operation is successful, an error message otherwise.
     """
     session = Session()
+    game = session.query(Game).filter_by(id=game_id).first()
+    if not game:
+        session.close()
+        return "Game not found"
+
     curr_round_obj = get_current_round_from_db(session, game_id)
     if not curr_round_obj:
         session.close()
@@ -245,8 +250,10 @@ def take_talon(game_id: str, player_id: str) -> str:
 
     # add the card to player's hand
     player.cards_current_list = player.cards_current_list + cards
+    game.game_state = GameState.GIVE_TWO_CARDS.value
 
     session.add(curr_round_obj)
+    session.add(game)
     session.add(player)
     session.commit()
     session.close()
@@ -297,6 +304,9 @@ def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
     prev_player = players[prev_player_local_id]
     prev_player.cards_current_list += [card2]
 
+    game.game_state = GameState.REBIDDING.value
+
+    session.add(game)
     session.add(curr_round_obj)
     session.add(next_player)
     session.add(prev_player)

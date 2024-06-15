@@ -21,7 +21,7 @@ class Round(Base):
     bid_starter = Column(Integer, default=0)  # player local id
     bids = Column(String, default="0,0,0")  # "p1bid,p2bid,p3bid"; 0: new, -1: pass, >100: bid_amount.i.e.: "100,-1,110"
     bid_winner = Column(Integer, default=-1)  # player local id
-    final_bid_amount = Column(Integer, default=0)
+    final_bid_amount = Column(Integer, default=100)
     trick = Column(String, default="0,0,0")
     trick_turn = Column(Integer, default=-1)
 

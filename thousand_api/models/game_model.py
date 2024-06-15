@@ -17,6 +17,7 @@ class GameState(Enum):
     PLAYING = "playing"
     BIDDING = "bidding"
     TALON = "talon"
+    GIVE_TWO_CARDS = "give_two_cards"
     REBIDDING = "rebidding"
     ROUND_FINISHED = "round_finished"
     FINISHED = "finished"
