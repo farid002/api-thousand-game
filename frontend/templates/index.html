@@ -63,53 +63,82 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const games = {{ games|tojson }};
-        const gamesData = {};
+    const games = {{ games|tojson }};
+    const players = {{ players|tojson }};
 
-        games.forEach(game => {
-            const dateStr = game.creation_date.split(' ')[0]; // Extract date part
-            if (gamesData[dateStr]) {
-                gamesData[dateStr]++;
+    // Function to aggregate counts by date
+    function aggregateByDate(data) {
+        const dataCounts = {};
+
+        data.forEach(item => {
+            const dateStr = item.creation_date.split(' ')[0]; // Extract date part
+            if (dataCounts[dateStr]) {
+                dataCounts[dateStr]++;
             } else {
-                gamesData[dateStr] = 1;
+                dataCounts[dateStr] = 1;
             }
         });
 
-        const dates = Object.keys(gamesData).sort();
-        const counts = dates.map(date => gamesData[date]);
+        return dataCounts;
+    }
 
-        const ctx = document.getElementById('gamesChart').getContext('2d');
-        const gamesChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [{
-                    label: 'Games Created',
-                    data: counts,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        beginAtZero: true
-                    },
-                    y: {
-                        beginAtZero: true
-                    }
+    // Aggregate games and players data by date
+    const gamesData = aggregateByDate(games);
+    const playersData = aggregateByDate(players);
+
+    // Combine dates and counts from both datasets
+    const allDates = new Set([...Object.keys(gamesData), ...Object.keys(playersData)]);
+    const combinedData = Array.from(allDates).sort().map(date => ({
+        date,
+        gamesCount: gamesData[date] || 0,
+        playersCount: playersData[date] || 0
+    }));
+
+    // Prepare data for chart.js
+    const labels = combinedData.map(item => item.date);
+    const gamesCounts = combinedData.map(item => item.gamesCount);
+    const playersCounts = combinedData.map(item => item.playersCount);
+
+    const ctx = document.getElementById('gamesChart').getContext('2d');
+    const gamesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Games Created',
+                data: gamesCounts,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                fill: true
+            }, {
+                label: 'Players Joined',
+                data: playersCounts,
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
-
-        // Ensure chart resizes correctly
-        window.addEventListener('resize', function () {
-            gamesChart.resize();
-        });
+        }
     });
+
+    // Ensure chart resizes correctly
+    window.addEventListener('resize', function () {
+        gamesChart.resize();
+    });
+});
+
 </script>
 {% endblock %}

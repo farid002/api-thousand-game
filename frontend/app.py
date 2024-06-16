@@ -34,6 +34,14 @@ def get_games():
     return render_template("games.html", games=games, FASTAPI_URL=FASTAPI_URL)
 
 
+@app.route("/tables")
+def get_tables():
+    """TODO: Write docstring"""
+    response = requests.get(FASTAPI_URL + "/table/all")
+    tables = response.json()
+    return render_template("tables.html", tables=tables, FASTAPI_URL=FASTAPI_URL)
+
+
 @app.route("/game/<game_id>", methods=["GET"])
 def get_game(game_id):
     """TODO: Write docstring"""

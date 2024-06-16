@@ -12,10 +12,11 @@ class Player(Base):
     __tablename__ = "player"
 
     id = Column(String, primary_key=True)  # global id, in our case email address
+
     local_id = Column(Integer)  # 0, 1 or 2
-    cards_init = Column(String)
-    cards_current = Column(String)
-    cards_played = Column(String)
+    cards_init = Column(String, default="")
+    cards_current = Column(String, default=0)
+    cards_played = Column(String, default=0)
     bolt_count = Column(Integer, default=0)
     barrel_count = Column(Integer, default=0)
     on_barrel_since = Column(Integer, default=0)
@@ -25,6 +26,10 @@ class Player(Base):
     silent = Column(Boolean, default=False)
 
     coins = Column(Integer, default=2000)
+    win_count = Column(Integer, default=0)
+    lose_count = Column(Integer, default=0)
+    total_games_played = Column(Integer, default=0)
+    creation_date = Column(String)
 
     @property
     def cards_init_list(self):
@@ -73,3 +78,16 @@ class Player(Base):
             self.max_biddable_amount += PairValue.SPADE.value
 
         return 0
+
+    def reset_after_game(self):
+        """Reset player after a game finished"""
+        self.cards_init = ""
+        self.cards_current = ""
+        self.cards_played = ""
+        self.bolt_count = 0
+        self.barrel_count = 0
+        self.on_barrel_since = 0
+        self.round_point = 0
+        self.point = 0
+        self.max_biddable_amount = 120
+        self.silent = False

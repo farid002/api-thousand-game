@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+</style>
+<h1>Tables</h1>
+<table id="tablesTable" class="display" style="max-width: 100%; table-layout: fixed; word-wrap: break-word;">
+    <thead>
+        <tr>
+            <th>Creation date</th>
+            <th>ID</th>
+            <th>Player 1</th>
+            <th>Player 2</th>
+            <th>Player 3</th>
+            <th>Table State</th>
+            <th>Till 1001</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if tables %}
+        {% for table in tables %}
+        <tr>
+            <td>{{ table.creation_date }}</td>
+            <td>{{ table.id }}</td>
+            <td>{{ table.player0_id }}</td>
+            <td>{{ table.player1_id }}</td>
+            <td>{{ table.player2_id }}</td>
+            <td>{{ table.table_state }}</td>
+            <td>{{ table.till_1001 }}</td>
+            <td>
+                <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal" data-id="{{ table.id }}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <a href="{{ FASTAPI_URL }}/table/{{ table.id }}/delete" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Creation Date</th>
+            <th>ID</th>
+            <th>Player 1</th>
+            <th>Player 2</th>
+            <th>Player 3</th>
+            <th>Table State</th>
+            <th>Till 1001</th>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Table</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="form-group">
+            <label for="editTableId">ID</label>
+            <input type="text" class="form-control" id="editTableId" required>
+          </div>
+          <div class="form-group">
+            <label for="editPlayer0Id">Player 1</label>
+            <input type="text" class="form-control" id="editPlayer0Id" required>
+          </div>
+          <div class="form-group">
+            <label for="editPlayer1Id">Player 2</label>
+            <input type="text" class="form-control" id="editPlayer1Id" required>
+          </div>
+          <div class="form-group">
+            <label for="editPlayer2Id">Player 3</label>
+            <input type="text" class="form-control" id="editPlayer2Id" required>
+          </div>
+          <div class="form-group">
+            <label for="editTableState">Table State</label>
+            <input type="text" class="form-control" id="editTableState" required>
+          </div>
+          <div class="form-group">
+            <label for="editTill1001">Till 1001</label>
+            <input type="text" class="form-control" id="editTill1001" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var FASTAPI_URL = "{{ FASTAPI_URL }}";
+
+    // Move the search inputs to the correct position
+    $('#tablesTable thead tr:eq(1) th').each(function(i) {
+        var title = $('#tablesTable thead tr:eq(0) th').eq(i).text();
+        $(this).html('<input type="text" placeholder="Search...' + '" />');
+    });
+
+    // Initialize the DataTable
+    var table = $('#tablesTable').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "order": [[0, "desc"]], // Sort by the first column (Creation date) in descending order by default
+        initComplete: function () {
+            this.api()
+            .columns()
+            .every(function () {
+                let column = this;
+                let title = column.footer().textContent;
+
+                // Create input element
+                let input = document.createElement('input');
+                input.placeholder = title;
+                column.footer().replaceChildren(input);
+
+                // Event listener for user input
+                input.addEventListener('keyup', () => {
+                    if (column.search() !== this.value) {
+                        column.search(input.value).draw();
+                    }
+                });
+            });
+        }
+    });
+
+    $('.edit-btn').on('click', function() {
+        const tableId = $(this).data('id');
+        $.get(`${FASTAPI_URL}/table/${tableId}`, function(data) {
+            $('#editTableId').val(data.id);
+            $('#editPlayer0Id').val(data.player0_id);
+            $('#editPlayer1Id').val(data.player1_id);
+            $('#editPlayer2Id').val(data.player2_id);
+            $('#editTableState').val(data.table_state);
+            $('#editTill1001').val(data.till_1001);
+        });
+    });
+
+    $('#editForm').on('submit', function(event) {
+        event.preventDefault();
+        const tableId = $('#editTableId').val();
+        const updatedTable = {
+            player0_id: $('#editPlayer0Id').val(),
+            player1_id: $('#editPlayer1Id').val(),
+            player2_id: $('#editPlayer2Id').val(),
+            table_state: $('#editTableState').val(),
+            till_1001: $('#editTill1001').val()
+        };
+
+        $.ajax({
+            url: `${FASTAPI_URL}/table/${tableId}/edit`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(updatedTable),
+            success: function() {
+                $('#editModal').modal('hide');
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                // Handle error here
+            }
+        });
+    });
+});
+
+</script>
+{% endblock %}

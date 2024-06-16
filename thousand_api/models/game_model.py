@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 
 from thousand_api.models.base_model import Base
 from thousand_api.models.player_model import Player
-from thousand_api.models.table_model import Table
+from thousand_api.models.table_model import Table, TableState
 
 
 class GameState(Enum):
@@ -45,3 +45,11 @@ class Game(Base):
     player2 = relationship("Player", foreign_keys="Game.player2_id")
     winner = relationship("Player", foreign_keys="Game.winner_id")
     table = relationship("Table", foreign_keys="Game.table_id")
+
+    def reset_after_game(self):
+        """Reset game and its players after game finished"""
+        self.game_state = GameState.FINISHED.value
+        self.table.table_state = TableState.GAME_FINISHED.value
+        self.player0.reset_after_game()
+        self.player1.reset_after_game()
+        self.player2.reset_after_game()

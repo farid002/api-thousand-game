@@ -451,13 +451,15 @@ def finalize_round(game_id: str):
         # wins whole game
         if players[round_obj.bid_winner].point >= 1000:
             game.game_state = GameState.FINISHED.value
-            game.winner_id = round_obj.bid_winner
+            game.winner_id = players[round_obj.bid_winner].id
             session.add(game)
+            session.commit()
             finalize_game(session, game_id)
+
+            return "SUCCESS"
 
     # bid winner loses
     else:
-
         # if point was 880, fell from barrel
         if players[round_obj.bid_winner].point == 880:
             players[round_obj.bid_winner].barrel_count += 1
@@ -483,6 +485,8 @@ def finalize_round(game_id: str):
                 player.bolt_count = 0
         elif player.local_id != round_obj.bid_winner:
             player.point += (player.round_point + 5) // 10 * 10  # assign won points except bid winner
+            if player.point > 880:
+                player.point = 880
 
         # silence assignment
         player.silent = True if player.point <= -240 else False
@@ -494,15 +498,37 @@ def finalize_round(game_id: str):
     session.add(round_obj)
     session.commit()
     session.close()
-    return
+
+    return "SUCCESS"
 
 
 def finalize_game(session, game_id: str):
     """TODO: Write docstring"""
     game = session.query(Game).filter_by(id=game_id).first()
 
-    game.player0.coins += game.table.entry_coins * 3 * 0.8 if game.winner_id == 0 else (-1 * game.table.entry_coins)
-    game.player1.coins += game.table.entry_coins * 3 * 0.8 if game.winner_id == 1 else (-1 * game.table.entry_coins)
-    game.player2.coins += game.table.entry_coins * 3 * 0.8 if game.winner_id == 2 else (-1 * game.table.entry_coins)
+    if game.winner_id == game.player0.id:
+        game.player0.coins += game.table.entry_coins * 3 * 0.8
+        game.player0.win_count += 1
+    else:
+        game.player0.coins -= game.table.entry_coins
+        game.player0.lose_count += 1
+
+    if game.winner_id == game.player1.id:
+        game.player1.coins += game.table.entry_coins * 3 * 0.8
+        game.player1.win_count += 1
+    else:
+        game.player1.coins -= game.table.entry_coins
+        game.player1.lose_count += 1
+
+    if game.winner_id == game.player2.id:
+        game.player2.coins += game.table.entry_coins * 3 * 0.8
+        game.player2.win_count += 1
+    else:
+        game.player2.coins -= game.table.entry_coins
+        game.player2.lose_count += 1
+
+    game.reset_after_game()
 
     session.add(game)
+    session.commit()
+    session.close()

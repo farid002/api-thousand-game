@@ -14,6 +14,7 @@ class TableState(Enum):
 
     CREATED = "created"
     GAME_STARTED = "game_started"
+    GAME_FINISHED = "game_finished"
     CANCELLED = "cancelled"
 
 

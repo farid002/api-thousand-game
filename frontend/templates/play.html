@@ -71,12 +71,12 @@ $(document).ready(function() {
                 $.get(`${FASTAPI_URL}/game/${gameId}/players`, function(playersData) {
                     $('#generalGameInfoContainer').empty();
                     const gameInfo = $('<div class="info-paragraph">').appendTo('#generalGameInfoContainer');
-                    $('<p>').text('Current Round: ').append($(`<span class="highlight">${gameData.current_round}</span>`)).appendTo(gameInfo);
-                    $('<p>').text('Game State: ').append($(`<span class="highlight">${gameData.game_state}</span>`)).appendTo(gameInfo);
-                    $('<p>').text('Talon: ').append($(`<span class="highlight">${roundData.talon}</span>`)).appendTo(gameInfo);
-                    $('<p>').text('Trick: ').append($(`<span class="highlight">${roundData.trick}</span>`)).appendTo(gameInfo);
-                    $('<p>').text('Trick Turn: ').append($(`<span class="highlight">${roundData.trick_turn}</span>`)).appendTo(gameInfo);
-                    $('<p>').text('Marriage: ').append($(`<span class="highlight">${roundData.activated_pair}</span>`)).appendTo(gameInfo);
+                    $('<p>').html(`Current Round: <span class="highlight">${gameData.current_round}</span>`).appendTo(gameInfo);
+                    $('<p>').html(`Game State: <span class="highlight">${gameData.game_state}</span>`).appendTo(gameInfo);
+                    $('<p>').html(`Talon: <span class="highlight">${roundData.talon}</span>`).appendTo(gameInfo);
+                    $('<p>').html(`Trick: <span class="highlight">${roundData.trick}</span>`).appendTo(gameInfo);
+                    $('<p>').html(`Trick Turn: <span class="highlight">${roundData.trick_turn}</span>`).appendTo(gameInfo);
+                    $('<p>').html(`Marriage: <span class="highlight">${roundData.activated_pair}</span>`).appendTo(gameInfo);
 
                     const newRoundButtonDiv = $('<div>').appendTo('#generalGameInfoContainer');
 
@@ -228,6 +228,7 @@ $(document).ready(function() {
             });
         });
     });
+    $('#gameSelect').trigger('change');
 });
 
 </script>

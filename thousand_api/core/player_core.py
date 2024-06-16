@@ -1,5 +1,7 @@
 """TODO: Write docstring"""
 
+from datetime import datetime
+
 from sqlalchemy import Boolean
 
 from thousand_api.db.database import Session
@@ -21,7 +23,7 @@ def get_player(player_id: str):
 def create_player(player_id: str):
     """TODO: Write docstring"""
     session = Session()
-    player = Player(id=player_id)
+    player = Player(id=player_id, creation_date=str(datetime.now()))
     session.add(player)
     session.commit()
     session.close()
