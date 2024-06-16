@@ -87,6 +87,7 @@ def start_round(game_id: str):
         round_number=game.current_round,
         game_id=game_id,
         bid_starter=(game.current_round + 2) % 3,
+        bid_turn=(game.current_round + 2) % 3,
         bid_winner=-1,
     )
     round_obj.bids_list = bid_list
@@ -146,6 +147,8 @@ def make_bid(game_id: str, player_id: str, bid: int):
         return "Round or player not found"
 
     player_local_id = next((index for index, player in enumerate(players) if player.id == player_id), None)
+    next_player_local_id = (player_local_id + 1) % 3
+    prev_player_local_id = (player_local_id + 2) % 3
 
     if curr_round_obj.bids_list[player_local_id] == "-1":
         session.close()
@@ -155,8 +158,8 @@ def make_bid(game_id: str, player_id: str, bid: int):
         session.close()
         return "Not this player's turn to bid"
 
-    next_player_bid = int(curr_round_obj.bids_list[(player_local_id + 1) % 3])
-    prev_player_bid = int(curr_round_obj.bids_list[(player_local_id + 2) % 3])
+    next_player_bid = int(curr_round_obj.bids_list[next_player_local_id])
+    prev_player_bid = int(curr_round_obj.bids_list[prev_player_local_id])
 
     if bid <= next_player_bid or bid <= prev_player_bid:
         session.close()
@@ -169,18 +172,20 @@ def make_bid(game_id: str, player_id: str, bid: int):
     temp_bids_list = curr_round_obj.bids_list
     temp_bids_list[player_local_id] = str(bid)
 
-    next_player = players[(player_local_id + 1) % 3]
-    prev_player = players[(player_local_id + 2) % 3]
+    next_player = players[next_player_local_id]
+    prev_player = players[prev_player_local_id]
 
     if bid >= next_player.max_biddable_amount:
-        temp_bids_list[(player_local_id + 1) % 3] = "-1"
+        temp_bids_list[next_player_local_id] = "-1"
 
     if bid >= prev_player.max_biddable_amount:
-        temp_bids_list[(player_local_id + 2) % 3] = "-1"
+        temp_bids_list[prev_player_local_id] = "-1"
 
     curr_round_obj.bids_list = temp_bids_list
     curr_round_obj.final_bid_amount = bid
-    curr_round_obj.bid_turn = (player_local_id + 1) % 3
+    curr_round_obj.bid_turn = (
+        next_player_local_id if temp_bids_list[next_player_local_id] != "-1" else prev_player_local_id
+    )
 
     if temp_bids_list.count("-1") >= 2:
         game.game_state = GameState.TALON.value

@@ -7,7 +7,7 @@ from thousand_api.core.player_core import *
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/all")
 def get_players_endpoint():
     """TODO: Write docstring"""
     return get_players()

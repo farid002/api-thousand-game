@@ -11,7 +11,11 @@ FASTAPI_URL = "http://147.78.130.54:5002"
 @app.route("/")
 def index():
     """TODO: Write docstring"""
-    return render_template("index.html", FASTAPI_URL=FASTAPI_URL)
+    games_response = requests.get(FASTAPI_URL + "/game/all")
+    players_response = requests.get(FASTAPI_URL + "/player/all")
+    games = games_response.json()
+    players = players_response.json()
+    return render_template("index.html", FASTAPI_URL=FASTAPI_URL, games=games, players=players)
 
 
 @app.route("/play")
@@ -66,7 +70,7 @@ def delete_game(game_id):
 @app.route("/players")
 def get_players():
     """TODO: Write docstring"""
-    response = requests.get(FASTAPI_URL + "/player")
+    response = requests.get(FASTAPI_URL + "/player/all")
     players = response.json()
     return render_template("players.html", players=players, FASTAPI_URL=FASTAPI_URL)
 
