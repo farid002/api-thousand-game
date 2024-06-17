@@ -1,16 +1,64 @@
-"""TODO: Write docstring"""
+"""Docstring"""
 
 import requests
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key"
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
 FASTAPI_URL = "http://147.78.130.54:5002"
-# FASTAPI_URL = "http://localhost:5002"  # for local debugging uncomment this line
+# FASTAPI_URL = "http://localhost:5002"  # for local debugging
+
+# Mock user database
+users = {"admin": {"password": generate_password_hash("admin", method="scrypt")}}
+
+
+class User(UserMixin):
+    """User class for login"""
+
+    def __init__(self, username):
+        """Init with id"""
+        self.id = username
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load user"""
+    return User(user_id) if user_id in users else None
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Login implementation"""
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        if username in users and check_password_hash(users[username]["password"], password):
+            user = User(username)
+            login_user(user)
+            return redirect(url_for("index"))
+        else:
+            flash("Invalid credentials")
+    return render_template("login.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    """Logout function"""
+    logout_user()
+    return redirect(url_for("login"))
 
 
 @app.route("/")
+@login_required
 def index():
-    """TODO: Write docstring"""
+    """Docstring"""
     games_response = requests.get(FASTAPI_URL + "/game/all")
     players_response = requests.get(FASTAPI_URL + "/player/all")
     games = games_response.json()
@@ -19,40 +67,45 @@ def index():
 
 
 @app.route("/play")
+@login_required
 def play():
-    """TODO: Write docstring"""
+    """Docstring"""
     response = requests.get(FASTAPI_URL + "/game/all")
     games = response.json()
     return render_template("play.html", games=games, FASTAPI_URL=FASTAPI_URL)
 
 
 @app.route("/games")
+@login_required
 def get_games():
-    """TODO: Write docstring"""
+    """Docstring"""
     response = requests.get(FASTAPI_URL + "/game/all")
     games = response.json()
     return render_template("games.html", games=games, FASTAPI_URL=FASTAPI_URL)
 
 
 @app.route("/tables")
+@login_required
 def get_tables():
-    """TODO: Write docstring"""
+    """Docstring"""
     response = requests.get(FASTAPI_URL + "/table/all")
     tables = response.json()
     return render_template("tables.html", tables=tables, FASTAPI_URL=FASTAPI_URL)
 
 
 @app.route("/game/<game_id>", methods=["GET"])
+@login_required
 def get_game(game_id):
-    """TODO: Write docstring"""
+    """Docstring"""
     response = requests.get(f"{FASTAPI_URL}/game/{game_id}")
     game = response.json()
     return game
 
 
 @app.route("/game/<game_id>/edit", methods=["GET", "POST"])
+@login_required
 def edit_game(game_id):
-    """TODO: Write docstring"""
+    """Docstring"""
     if request.method == "POST":
         game_data = request.json
         player0_id = game_data["player0_id"]
@@ -69,31 +122,35 @@ def edit_game(game_id):
 
 
 @app.route("/game/<game_id>/delete")
+@login_required
 def delete_game(game_id):
-    """TODO: Write docstring"""
+    """Docstring"""
     requests.delete(f"{FASTAPI_URL}/game/{game_id}")
     return redirect(url_for("get_games"))
 
 
 @app.route("/players")
+@login_required
 def get_players():
-    """TODO: Write docstring"""
+    """Docstring"""
     response = requests.get(FASTAPI_URL + "/player/all")
     players = response.json()
     return render_template("players.html", players=players, FASTAPI_URL=FASTAPI_URL)
 
 
 @app.route("/player/<player_id>", methods=["GET"])
+@login_required
 def get_player(player_id):
-    """TODO: Write docstring"""
+    """Docstring"""
     response = requests.get(f"{FASTAPI_URL}/player/{player_id}")
     player = response.json()
     return player
 
 
 @app.route("/player/<player_id>/edit", methods=["GET", "POST"])
+@login_required
 def edit_player(player_id):
-    """TODO: Write docstring"""
+    """Docstring"""
     if request.method == "POST":
         player_data = request.json
         local_id = player_data["local_id"]
@@ -121,12 +178,12 @@ def edit_player(player_id):
 
 
 @app.route("/player/<player_id>/delete")
+@login_required
 def delete_player(player_id):
-    """TODO: Write docstring"""
+    """Docstring"""
     requests.delete(f"{FASTAPI_URL}/player/{player_id}")
     return redirect(url_for("get_players"))
 
 
 if __name__ == "__main__":
-    """TODO: Write docstring"""
     app.run(debug=True)

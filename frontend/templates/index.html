@@ -33,17 +33,17 @@
             <div class="card text-white bg-warning mb-3">
                 <div class="card-header">Statistics</div>
                 <div class="card-body">
-                    <h5 class="card-title">Additional Info</h5>
-                    <p class="card-text">Some additional statistics.</p>
+                    <h5 class="card-title">1263 $ (draft)</h5>
+                    <p class="card-text">Total coins sales.</p>
                 </div>
             </div>
         </div>
         <div class="col-lg-3">
             <div class="card text-white bg-info mb-3">
-                <div class="card-header">Reports</div>
+                <div class="card-header">Watched videos</div>
                 <div class="card-body">
-                    <h5 class="card-title">Reports Data</h5>
-                    <p class="card-text">Some reports info.</p>
+                    <h5 class="card-title">5h 14m 43s (draft)</h5>
+                    <p class="card-text">Length of total ads watched.</p>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card mb-3">
-                <div class="card-header">Games Created Per Day</div>
+                <div class="card-header">Creation statistics</div>
                 <div class="card-body">
                     <canvas id="gamesChart"></canvas>
                 </div>
@@ -62,7 +62,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const games = {{ games|tojson }};
     const players = {{ players|tojson }};
 
@@ -86,9 +86,30 @@
     const gamesData = aggregateByDate(games);
     const playersData = aggregateByDate(players);
 
-    // Combine dates and counts from both datasets
-    const allDates = new Set([...Object.keys(gamesData), ...Object.keys(playersData)]);
-    const combinedData = Array.from(allDates).sort().map(date => ({
+    // Function to generate a list of dates from start to end
+    function getDateRange(startDate, endDate) {
+        const dateArray = [];
+        let currentDate = new Date(startDate);
+        const end = new Date(endDate);
+
+        while (currentDate <= end) {
+            dateArray.push(currentDate.toISOString().split('T')[0]);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return dateArray;
+    }
+
+    // Find the earliest and latest dates from the data
+    const allDates = [...Object.keys(gamesData), ...Object.keys(playersData)].sort();
+    const startDate = allDates[0];
+    const endDate = new Date().toISOString().split('T')[0]; // Today's date
+
+    // Generate the full date range
+    const dateRange = getDateRange(startDate, endDate);
+
+    // Combine dates and counts from both datasets, ensuring every date in the range is represented
+    const combinedData = dateRange.map(date => ({
         date,
         gamesCount: gamesData[date] || 0,
         playersCount: playersData[date] || 0
@@ -139,6 +160,7 @@
         gamesChart.resize();
     });
 });
+
 
 </script>
 {% endblock %}
