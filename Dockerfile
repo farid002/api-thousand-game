@@ -17,7 +17,7 @@ EXPOSE 80
 ENV PYTHONUNBUFFERED=1
 
 # Ensure the sqlite_db directory exists
-RUN mkdir -p /app/sqlite_db
+RUN mkdir -p /app/db
 
 # Run uvicorn server
 CMD ["python", "-m", "thousand_api.main"]
