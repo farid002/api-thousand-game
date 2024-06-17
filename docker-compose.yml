@@ -12,6 +12,7 @@ services:
       - APP_ENV=production
     volumes:
       - .:/app
+      - ./sqlite_db:/app/sqlite_db
 
   frontend:
     build:
