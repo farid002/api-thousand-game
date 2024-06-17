@@ -4,4 +4,5 @@ uvicorn
 sqlalchemy
 requests
 flask
+flask_login
 pre-commit
