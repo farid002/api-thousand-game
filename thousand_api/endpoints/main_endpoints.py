@@ -37,6 +37,12 @@ def take_talon_endpoint(game_id: str, player_id: str):
     return take_talon(game_id, player_id)
 
 
+@router.put("/game/{game_id}/fold")
+def fold_endpoint(game_id: str, player_id: str):
+    """TODO: Write docstring"""
+    return fold(game_id, player_id)
+
+
 @router.put("/game/{game_id}/give_two_cards")
 def give_two_cards_endpoint(game_id: str, player_id: str, card1: str, card2: str):
     """TODO: Write docstring"""

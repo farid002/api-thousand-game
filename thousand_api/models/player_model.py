@@ -13,7 +13,7 @@ class Player(Base):
 
     id = Column(String, primary_key=True)  # global id, in our case email address
 
-    local_id = Column(Integer)  # 0, 1 or 2
+    local_id = Column(Integer, default=-1)  # 0, 1 or 2
     cards_init = Column(String, default="")
     cards_current = Column(String, default=0)
     cards_played = Column(String, default=0)
@@ -91,3 +91,4 @@ class Player(Base):
         self.point = 0
         self.max_biddable_amount = 120
         self.silent = False
+        self.local_id = -1

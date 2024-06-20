@@ -34,6 +34,10 @@ def create_table(
         till_1001=till_1001,
     )
 
+    player = session.query(Player).filter_by(id=creator_player_id).first()
+    player.local_id = 0
+
+    session.add(player)
     session.add(table)
     session.commit()
     session.close()
@@ -139,6 +143,9 @@ def add_player(table_id: str, player_id: str):
     session = Session()
     table = session.query(Table).filter_by(id=table_id).first()
     player = session.query(Player).filter_by(id=player_id).first()
+
+    if player.local_id != -1:
+        return "Player is already in a game"
 
     if table:
         if table.player0_id == "" or table.player0_id is None:

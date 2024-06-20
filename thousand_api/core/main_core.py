@@ -211,11 +211,15 @@ def pass_bid(game_id: str, player_id: str):
         return "Round or player not found"
 
     player_local_id = bidding_player.local_id
+    next_player_local_id = (player_local_id + 1) % 3
+    prev_player_local_id = (player_local_id + 2) % 3
 
     temp_bids_list = curr_round_obj.bids_list
-    temp_bids_list[player_local_id] = str(-1)  # -1 for pass
+    temp_bids_list[player_local_id] = "-1"  # -1 for pass
     curr_round_obj.bids_list = temp_bids_list
-
+    curr_round_obj.bid_turn = (
+        next_player_local_id if temp_bids_list[next_player_local_id] != "-1" else prev_player_local_id
+    )
     if temp_bids_list.count("-1") >= 2:
         game.game_state = GameState.TALON.value
         curr_round_obj.bid_winner = next((index for index, value in enumerate(temp_bids_list) if value != "-1"), None)
@@ -273,6 +277,46 @@ def take_talon(game_id: str, player_id: str) -> str:
     return "Cards taken successfully"
 
 
+def fold(game_id: str, player_id: str) -> str:
+    """
+    Allows a player to fold.
+
+    Args:
+        game_id (str): The ID of the game.
+        player_id (str): The Global ID of the player (eg: jane.doe@example.com).
+
+    Returns:
+        str: A success message if the fold operation is successful, an error message otherwise.
+    """
+    session = Session()
+    game = session.query(Game).filter_by(id=game_id).first()
+    if not game:
+        session.close()
+        return "Game not found"
+
+    curr_round_obj = get_current_round_from_db(session, game_id)
+    if not curr_round_obj:
+        session.close()
+        return "Round not found"
+
+    for player in [game.player0, game.player1, game.player2]:
+        if player.local_id == curr_round_obj.bid_winner:
+            player.round_point = -120
+        else:
+            player.round_point = 60
+
+        session.merge(player)
+
+    session.add(curr_round_obj)
+    session.add(game)
+    session.commit()
+    session.close()
+
+    finalize_round(game_id)
+    # TODO: we need return class for all responses, e.g. Response(code=200, message="Cards taken successfully")
+    return "Folded successfully"
+
+
 def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
     """Gives first card to next player, second card to previous player
 
@@ -315,6 +359,7 @@ def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
     prev_player = players[prev_player_local_id]
     prev_player.cards_current_list += [card2]
 
+    curr_round_obj.bid_turn = curr_round_obj.bid_winner
     game.game_state = GameState.REBIDDING.value
 
     session.add(game)
@@ -472,7 +517,6 @@ def finalize_round(game_id: str):
             players[round_obj.bid_winner].on_barrel_since = 0
             players[round_obj.bid_winner].point = 0
             players[round_obj.bid_winner].bolt_count = 0
-
         else:
             players[round_obj.bid_winner].point -= round_obj.final_bid_amount
 
@@ -488,6 +532,15 @@ def finalize_round(game_id: str):
             if player.point > 880:
                 player.point = 880
 
+        if round_obj.on_barrel == player.local_id and player.on_barrel_since == 3:
+            player.barrel_count += 1
+            player.point -= 120
+            if player.barrel_count == 3:
+                player.barrel_count = 0
+                player.on_barrel_since = 0
+                player.point = 0
+                player.bolt_count = 0
+
         # silence assignment
         player.silent = True if player.point <= -240 else False
 
@@ -495,7 +548,10 @@ def finalize_round(game_id: str):
         player.round_point = 0
         session.merge(player)
 
+    game.game_state = GameState.ROUND_FINISHED.value
+
     session.add(round_obj)
+    session.add(game)
     session.commit()
     session.close()
 
