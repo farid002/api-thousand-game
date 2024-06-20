@@ -367,6 +367,13 @@ def give_two_cards(game_id: str, player_id: str, card1: str, card2: str):
     session.add(next_player)
     session.add(prev_player)
     session.commit()
+
+    game.player0.assign_max_biddable_amount()
+    game.player1.assign_max_biddable_amount()
+    game.player2.assign_max_biddable_amount()
+
+    session.add(game)
+    session.commit()
     session.close()
 
     return "Cards given successfuly"
