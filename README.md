@@ -31,6 +31,16 @@ Class Diagram of the API has been illustrated below.
 **DID YOU MODIFY ANYTHING RELATED DATABASE?**
  - Follow the instructions on "Additional" section!
 
+## JWT Authentication
+
+- We use PyJWT for authentication with signed key method in accordance with RFC 7519 (JSON Web Token standard).
+
+![diagram](assets/jwt-authentication.png)
+
++ [FastAPI OAuth2](https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/)
++ [JWT Authentication](https://jwt.io/)
++ [RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519)
+
 ## Docker setup
 - Follow the Docker installation (for WSL) as in https://dataedo.com/docs/installing-docker-on-windows-via-wsl
 - or for Ubuntu: https://docs.docker.com/engine/install/ubuntu/
