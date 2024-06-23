@@ -5,6 +5,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm
+)
 from http import HTTPStatus
 import jwt
 
@@ -20,10 +24,17 @@ from thousand_api.core.game_core import (
 
 router = APIRouter()
 
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="authenticate",
+)
 
-def protected(token: str) -> str:
+SECRET_KEY = "victoriassecret"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
+
+def protected(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     """Get token, verify and return user_id"""
-    decoded = jwt.decode(jwt=token, key='victoriasecret', algorithms=["HS256"])
+    decoded = jwt.decode(jwt=token, key=SECRET_KEY, algorithms=[ALGORITHM])
     user = decoded.get('sub', None)
     return user
 
@@ -33,7 +44,7 @@ def authenticate(username: str, password: str):
     """If username, password are correct return token"""
     if username == 'admin' and password == 'admin':
         now = datetime.now(timezone.utc)
-        token = jwt.encode({"sub": username, "exp": now + timedelta(hours=3)}, key='victoriasecret', algorithm="HS256")
+        token = jwt.encode({"sub": username, "exp": now + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)}, key=SECRET_KEY, algorithm=ALGORITHM)
         response_map = {}
         response_map['data'] = token
         response_map['message'] = f"{username} logged in successfully"
