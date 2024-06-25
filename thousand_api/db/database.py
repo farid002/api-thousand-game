@@ -9,7 +9,7 @@ from thousand_api.models.player_model import Player
 from thousand_api.models.round_model import Round
 
 # engine = create_engine("sqlite:///../tests/games.db")  # for tests
-engine = create_engine("sqlite:///db/games.db")
+engine = create_engine("sqlite:///thousand_api/db/games.db")
 Session = sessionmaker(bind=engine)
 
 
