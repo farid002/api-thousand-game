@@ -12,7 +12,7 @@ services:
       - APP_ENV=production
     volumes:
       - .:/app
-      - ./db:/app/db
+      - ./thousand_api/db:/app/thousand_api/db
 
   frontend:
     build:
