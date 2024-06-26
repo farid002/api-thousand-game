@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: thousand-api
     ports:
-      - "5002:5002"  # Assuming FastAPI app runs on port 5001
+      - "5002:5002"  # Assuming FastAPI app runs on port 5002
     environment:
       - APP_ENV=production
     volumes:
