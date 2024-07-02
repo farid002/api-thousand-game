@@ -34,11 +34,10 @@ Class Diagram of the API has been illustrated below.
 ## Docker setup
 - Follow the Docker installation (for WSL) as in https://dataedo.com/docs/installing-docker-on-windows-via-wsl
 - or for Ubuntu: https://docs.docker.com/engine/install/ubuntu/
-- Install Docker Compose as in https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04 
-- 
+- Install Docker Compose as in https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04
 - Run `docker compose up -d --build`
-- 
-- OR:
+
+OR:
 - Build Docker Image: 
    ```
    docker build -t thousandapi .
@@ -48,6 +47,7 @@ Class Diagram of the API has been illustrated below.
    docker run -d --name thousandapi_container -p 5001:5001 thousandapi
    ```
 - (additional) Get IP Address with: ```ip addr show eth0 | grep inet```
+
 ## Contribution
 - Don't forget to activate pre-commit locally (as stated on Setup steps)
 - Follow correct naming conventions, especially PEP8 standards. Check further on: https://peps.python.org/pep-0008/
@@ -67,3 +67,6 @@ Class Diagram of the API has been illustrated below.
 
  - install eralchemy: pip install eralchemy2
  - generate UML: eralchemy2 -i sqlite:///games.db -o er-diagram.jpg
+
+### General user flow
+![Flow Chart](assets/flowchart.jpg)
