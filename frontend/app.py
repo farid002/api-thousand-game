@@ -5,14 +5,13 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from common.config import FASTAPI_URL
+
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-
-FASTAPI_URL = "http://147.78.130.54:5002"
-# FASTAPI_URL = "http://localhost:5002"  # for local debugging
 
 # Mock user database
 users = {"admin": {"password": generate_password_hash("admin", method="scrypt")}}

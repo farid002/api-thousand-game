@@ -3,13 +3,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from common.config import DB_PATH
 from thousand_api.models.base_model import Base
 from thousand_api.models.game_model import Game
 from thousand_api.models.player_model import Player
 from thousand_api.models.round_model import Round
 
-# engine = create_engine("sqlite:///../tests/games.db")  # for tests
-engine = create_engine("sqlite:///thousand_api/db/games.db")
+engine = create_engine(DB_PATH)
 Session = sessionmaker(bind=engine)
 
 

@@ -19,6 +19,12 @@ def create_table(
 ):
     """TODO: Write docstring"""
     session = Session()
+    player = session.query(Player).filter_by(id=creator_player_id).first()
+
+    if player is None:
+        return "Player could not be found"
+    if player.coins < entry_coins:
+        return "Player does not have enough coins"
 
     table_id = str(uuid.uuid4())
     table = Table(
@@ -146,6 +152,9 @@ def add_player(table_id: str, player_id: str):
 
     if player.local_id != -1:
         return "Player is already in a game"
+
+    if player.coins < table.entry_coins:
+        return "Player does not have enough coins"
 
     if table:
         if table.player0_id == "" or table.player0_id is None:

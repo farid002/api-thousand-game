@@ -49,6 +49,13 @@ def create_game(table_id: str):
         player2_id=table.player2_id,
         creation_date=str(datetime.now()),
     )
+    session.add(game)
+    session.commit()
+
+    game.player0.coins -= table.entry_coins
+    game.player1.coins -= table.entry_coins
+    game.player2.coins -= table.entry_coins
+
     table.table_state = TableState.GAME_STARTED.value
 
     session.add(game)
@@ -573,21 +580,18 @@ def finalize_game(session, game_id: str):
         game.player0.coins += game.table.entry_coins * 3 * 0.8
         game.player0.win_count += 1
     else:
-        game.player0.coins -= game.table.entry_coins
         game.player0.lose_count += 1
 
     if game.winner_id == game.player1.id:
         game.player1.coins += game.table.entry_coins * 3 * 0.8
         game.player1.win_count += 1
     else:
-        game.player1.coins -= game.table.entry_coins
         game.player1.lose_count += 1
 
     if game.winner_id == game.player2.id:
         game.player2.coins += game.table.entry_coins * 3 * 0.8
         game.player2.win_count += 1
     else:
-        game.player2.coins -= game.table.entry_coins
         game.player2.lose_count += 1
 
     game.reset_after_game()
