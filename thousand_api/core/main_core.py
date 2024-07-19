@@ -41,6 +41,9 @@ def create_game(table_id: str):
     ):
         return "Not enough people on the lobby to start the game"
 
+    if not table.player0.ready_to_play or not table.player1.ready_to_play or not table.player2.ready_to_play:
+        return "At least one player not ready to start the game"
+
     game = Game(
         id=game_id,
         table_id=table_id,

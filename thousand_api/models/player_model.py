@@ -12,6 +12,7 @@ class Player(Base):
     __tablename__ = "player"
 
     id = Column(String, primary_key=True)  # global id, in our case email address
+    ready_to_play = Column(Boolean, default=False)
 
     local_id = Column(Integer, default=-1)  # 0, 1 or 2
     cards_init = Column(String, default="")

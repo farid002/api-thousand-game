@@ -120,7 +120,7 @@ def update_player(
 
 
 def get_players():
-    """TODO: Write docstring"""
+    """List all players"""
     session = Session()
     players = session.query(Player).all()
     session.close()
@@ -128,4 +128,38 @@ def get_players():
     if players:
         return players
     else:
+        return None
+
+
+def make_ready(player_id):
+    """Make a player ready"""
+    session = Session()
+    player = session.query(Player).filter_by(id=player_id).first()
+
+    if player:
+        player.ready_to_play = True
+        session.add(player)
+        session.commit()
+        session.close()
+
+        return "SUCCESS"
+    else:
+        session.close()
+        return None
+
+
+def make_unready(player_id):
+    """Make a player unready"""
+    session = Session()
+    player = session.query(Player).filter_by(id=player_id).first()
+
+    if player:
+        player.ready_to_play = False
+        session.add(player)
+        session.commit()
+        session.close()
+
+        return "SUCCESS"
+    else:
+        session.close()
         return None
