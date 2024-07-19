@@ -61,15 +61,3 @@ def update_player_endpoint(
         max_biddable_amount,
         silent,
     )
-
-
-@router.post("/{player_id}/ready")
-def ready_player_endpoint(player_id):
-    """Ready player on the table"""
-    return make_ready(player_id)
-
-
-@router.post("/{player_id}/unready")
-def unready_player_endpoint(player_id):
-    """Unready player on the table"""
-    return make_unready(player_id)

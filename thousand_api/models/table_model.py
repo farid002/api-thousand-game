@@ -27,6 +27,7 @@ class Table(Base):
     player0_id = Column(String, ForeignKey(Player.id))
     player1_id = Column(String, ForeignKey(Player.id))
     player2_id = Column(String, ForeignKey(Player.id))
+    players_readiness = Column(String, default="0,0,0")  # 1 if ready
     creation_date = Column(String)
     table_state = Column(String, default=TableState.CREATED.value)
 
@@ -40,3 +41,13 @@ class Table(Base):
     player0 = relationship("Player", foreign_keys="Table.player0_id")
     player1 = relationship("Player", foreign_keys="Table.player1_id")
     player2 = relationship("Player", foreign_keys="Table.player2_id")
+
+    @property
+    def players_readiness_list(self):
+        """Getter: readiness"""
+        return self.players_readiness.split(",") if self.players_readiness else []
+
+    @players_readiness_list.setter
+    def players_readiness_list(self, value):
+        """Setter: players_readiness"""
+        self.players_readiness = ",".join(value) if value else ""

@@ -9,6 +9,8 @@ from thousand_api.core.table_core import (
     get_players,
     get_table,
     get_tables,
+    make_ready,
+    make_unready,
     update_table,
 )
 
@@ -63,3 +65,15 @@ def get_players_endpoint(table_id: str):
 def add_player_endpoint(table_id: str, player_id: str):
     """TODO: Write docstring"""
     return add_player(table_id=table_id, player_id=player_id)
+
+
+@router.post("/{table_id}/ready/{player_local_id}")
+def make_ready_player_endpoint(table_id: str, player_local_id: int):
+    """Make a player ready when he/she presses ready button"""
+    return make_ready(table_id=table_id, player_local_id=player_local_id)
+
+
+@router.post("/{table_id}/unready/{player_local_id}")
+def make_unready_player_endpoint(table_id: str, player_local_id: int):
+    """Make a player ready when he/she presses ready button"""
+    return make_unready(table_id=table_id, player_local_id=player_local_id)

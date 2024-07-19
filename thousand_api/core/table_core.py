@@ -177,3 +177,30 @@ def add_player(table_id: str, player_id: str):
     else:
         session.close()
         return "Table not found"
+
+
+def make_ready(table_id: str, player_local_id: int):
+    """Make a player ready to play"""
+    session = Session()
+
+    table = session.query(Table).filter_by(id=table_id).first()
+    readiness = table.players_readiness_list
+    readiness[player_local_id] = "1"
+    table.players_readiness_list = readiness
+
+    session.add(table)
+    session.commit()
+    session.close()
+
+
+def make_unready(table_id: str, player_local_id: int):
+    """Make a player unready"""
+    session = Session()
+    table = session.query(Table).filter_by(id=table_id).first()
+    readiness = table.players_readiness_list
+    readiness[player_local_id] = "0"
+    table.players_readiness_list = readiness
+
+    session.add(table)
+    session.commit()
+    session.close()
