@@ -135,12 +135,14 @@ def get_tables():
 def get_players(table_id: str):
     """TODO: Write docstring"""
     session = Session()
-    table = session.query(Table).filter(id == table_id).first()
-    session.close()
+    table = session.query(Table).filter_by(id=table_id).first()
 
     if table:
-        return [table.player0, table.player1, table.player2]
+        players = [table.player0, table.player1, table.player2]
+        session.close()
+        return players
     else:
+        session.close()
         return None
 
 
